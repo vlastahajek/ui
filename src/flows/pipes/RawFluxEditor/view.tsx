@@ -3,7 +3,7 @@ import React, {
   FC,
   lazy,
   Suspense,
-  useMemo,
+  useState,
   useContext,
   useCallback,
 } from 'react'
@@ -11,7 +11,11 @@ import {
   RemoteDataState,
   SpinnerContainer,
   TechnoSpinner,
+  SquareButton,
+  IconFont,
+  ComponentColor,
 } from '@influxdata/clockface'
+
 
 // Types
 import {PipeProp} from 'src/types/flows'
@@ -28,8 +32,12 @@ const FluxMonacoEditor = lazy(() =>
 
 const Query: FC<PipeProp> = ({Context}) => {
   const {data, update} = useContext(PipeContext)
+  const [showFn, setShowFn] = useState(false)
   const {queries, activeQuery} = data
   const query = queries[activeQuery]
+  const toggleFn = useCallback(() => {
+      setShowFn(!showFn)
+  }, [setShowFn, showFn])
 
   const updateText = useCallback(
     text => {
@@ -43,10 +51,21 @@ const Query: FC<PipeProp> = ({Context}) => {
     },
     [update, queries, activeQuery]
   )
+  const controls = (
+      <SquareButton
+        icon={IconFont.Function}
+        onClick={toggleFn}
+        color={
+          showFn ? ComponentColor.Primary : ComponentColor.Default
+        }
+        titleText="Function Reference"
+        className="flows-config-function-button"
+      />
+  )
 
   return useMemo(
     () => (
-      <Context>
+      <Context controls={controls}>
         <Suspense
           fallback={
             <SpinnerContainer
@@ -55,12 +74,21 @@ const Query: FC<PipeProp> = ({Context}) => {
             />
           }
         >
+            <div style={{display: 'flex'}}>
+                <div style={{flexGrow: 1, flexBasis: '100%'}}>
           <FluxMonacoEditor
             script={query.text}
             onChangeScript={updateText}
             onSubmitScript={() => {}}
             autogrow
           />
+                </div>
+                {showFn && (
+                <div style={{flex: '0 0 300px'}}>
+                    <h1>NEATEO</h1>
+                </div>
+                )}
+                </div>
         </Suspense>
       </Context>
     ),
