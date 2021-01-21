@@ -25,6 +25,7 @@ import {PipeContext} from 'src/flows/context/pipe'
 
 // Styles
 import 'src/flows/pipes/RawFluxEditor/style.scss'
+import { inherits } from 'util'
 
 const FluxMonacoEditor = lazy(() =>
   import('src/shared/components/FluxMonacoEditor')
@@ -63,9 +64,9 @@ const Query: FC<PipeProp> = ({Context}) => {
       />
   )
 
-  return useMemo(
-    () => (
-      <Context controls={controls}>
+  // return useMemo(
+  //   () => (
+      return <Context controls={controls}>
         <Suspense
           fallback={
             <SpinnerContainer
@@ -75,25 +76,26 @@ const Query: FC<PipeProp> = ({Context}) => {
           }
         >
             <div style={{display: 'flex'}}>
-                <div style={{flexGrow: 1, flexBasis: '100%'}}>
-          <FluxMonacoEditor
-            script={query.text}
-            onChangeScript={updateText}
-            onSubmitScript={() => {}}
-            autogrow
-          />
+                <div style={{display: 'flex', flex: 7, overflow: 'hidden'}}>
+                  <div style={{width: '100%'}}>
+                    <FluxMonacoEditor
+                      script={query.text}
+                      onChangeScript={updateText}
+                      onSubmitScript={() => {}}
+                      autogrow
+                    />
+                    </div>
                 </div>
-                {showFn && (
-                <div style={{flex: '0 0 300px'}}>
+                { showFn && <div style={{display: 'flex', flex: 1}}>
                     <h1>NEATEO</h1>
                 </div>
-                )}
+                }
                 </div>
         </Suspense>
       </Context>
-    ),
-    [query.text, updateText]
-  )
+  //   ),
+  //   [query.text, updateText]
+  // )
 }
 
 export default Query
