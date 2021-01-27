@@ -29,7 +29,9 @@ type ReduxProps = ConnectedProps<typeof connector>
 type Props = OwnProps & ReduxProps
 
 const placeHolderText = 'select a value'
-
+//todo:  play with focus....if the entire item loses focus, then
+//the input should show the actual selected item, not what the user typed in
+//think on this.....
 class VariableDropdown extends PureComponent<Props> {
   constructor(props) {
     super(props)
@@ -88,7 +90,6 @@ class VariableDropdown extends PureComponent<Props> {
             testID="variable-dropdown--button"
             status={dropdownStatus}
           >
-            {' '}
             <Input
               style={widthStyle}
               placeholder={placeHolderText}
