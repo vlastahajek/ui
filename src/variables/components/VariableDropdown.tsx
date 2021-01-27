@@ -74,14 +74,7 @@ class VariableDropdown extends PureComponent<Props> {
     const dropdownStatus =
       values.length === 0 ? ComponentStatus.Disabled : ComponentStatus.Default
 
-    const allVals = [placeHolderText, ...values]
-    const longestItemWidth = Math.floor(
-      allVals.reduce(function(a, b) {
-        return a.length > b.length ? a : b
-      }, '').length * 9.5
-    )
-
-    const widthLength = Math.max(140, longestItemWidth)
+    const widthStyle = this.getWidth()
 
     return (
       <Dropdown
@@ -97,6 +90,7 @@ class VariableDropdown extends PureComponent<Props> {
           >
             {' '}
             <Input
+              style={widthStyle}
               placeholder={placeHolderText}
               onChange={e => this.filterVals(e.target.value)}
               value={typedValue}
@@ -105,7 +99,7 @@ class VariableDropdown extends PureComponent<Props> {
         )}
         menu={onCollapse => (
           <Dropdown.Menu
-            style={{width: `${widthLength}px`}}
+            style={widthStyle}
             onCollapse={onCollapse}
             theme={DropdownMenuTheme.Amethyst}
           >
@@ -130,6 +124,20 @@ class VariableDropdown extends PureComponent<Props> {
     )
   }
 
+  private getWidth() {
+    const {values} = this.props
+    const allVals = [placeHolderText, ...values]
+    const longestItemWidth = Math.floor(
+      allVals.reduce(function(a, b) {
+        return a.length > b.length ? a : b
+      }, '').length * 10
+    )
+
+    const widthLength = Math.max(140, longestItemWidth)
+    const widthStyle = {width: `${widthLength}px`}
+    return widthStyle
+  }
+
   private handleSelect = (selectedValue: string) => {
     const {
       variableID,
@@ -148,6 +156,8 @@ class VariableDropdown extends PureComponent<Props> {
     this.setState({typedValue: selectedValue})
   }
 
+  // todo:  show the 'loading' or 'no values' as a string (no input field yet!)
+  // when it is loading
   private get selectedText() {
     const {selectedValue, status} = this.props
     if (status === RemoteDataState.Loading) {
