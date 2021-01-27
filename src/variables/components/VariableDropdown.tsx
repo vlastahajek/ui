@@ -130,7 +130,7 @@ console.log("jill23...shownValues??", this.state.shownValues)
           >  <Input
               placeholder='select a value'
               onChange={e => this.filterVals(e.target.value)}
-              value={typedValue || this.selectedText}
+              value={typedValue}
           />
 
           </Dropdown.Button>
@@ -177,7 +177,7 @@ console.log("jill23...shownValues??", this.state.shownValues)
     if (onSelect) {
       onSelect()
     }
-    this.setState({typedValue:''})
+    this.setState({typedValue:selectedValue})
   }
 
   private get selectedText() {
