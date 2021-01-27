@@ -33,14 +33,13 @@ export const FeatureFlag: FunctionComponent<{
 
 export const getUserFlags = () => activeFlags(getStore().getState())
 
-const orderObject = (unordered) => {
-  return Object.keys(unordered).sort().reduce(
-      (obj, key) => {
-        obj[key] = unordered[key];
-        return obj;
-      },
-      {}
-  );
+const orderObject = unordered => {
+  return Object.keys(unordered)
+    .sort()
+    .reduce((obj, key) => {
+      obj[key] = unordered[key]
+      return obj
+    }, {})
 }
 
 /* eslint-disable no-console */
