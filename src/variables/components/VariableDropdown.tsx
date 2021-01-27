@@ -57,13 +57,19 @@ class VariableDropdown extends PureComponent<Props> {
   const filterVals = (ack) => {
     const {values} = this.props
 
-    const result = values.filter(val =>
-        val.toLowerCase().indexOf(ack.toLowerCase()) !== -1
-    )
+    if (!ack) {
+      console.log("empty string....show everything");
+      this.setState({shownValues: values, typedValue: ack});
 
-    console.log("filtering??? jill-ack1", result)
+    } else {
+      const result = values.filter(val =>
+          val.toLowerCase().indexOf(ack.toLowerCase()) !== -1
+      )
 
-    this.setState({shownValues:result, typedValue: ack})
+      console.log("filtering??? jill-ack1", result)
+
+      this.setState({shownValues: result, typedValue: ack})
+    }
   }
 
   // setFocus() {
