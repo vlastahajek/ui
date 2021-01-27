@@ -38,12 +38,19 @@ class VariableDropdown extends PureComponent<Props> {
     }
   }
 
+  //only want this to run *once* when the values get loaded
   componentDidUpdate(prevProps){
     const prevVals = prevProps.values
-    const values = this.props.values
+    const {values, selectedValue} = this.props
+    const {loaded} = this.state
 
-    if (prevVals.length !== values.length){
-      this.setState({shownValues:values})
+
+    console.log("in component did update!")
+    if (!loaded && prevVals.length !== values.length){
+      console.log("actually updating...");
+      this.setState({shownValues:values, typedValue: selectedValue, loaded: true})
+    } else {
+      console.log("not updating...");
     }
   }
 
@@ -58,6 +65,29 @@ class VariableDropdown extends PureComponent<Props> {
 
     this.setState({shownValues:result, typedValue: ack})
   }
+
+  // setFocus() {
+  //   this.setInputFocused(true);
+  // }
+  // setInputFocused(focused) {
+  //   this.setState({inputFocused:focused});
+  // }
+  //
+  // setBlur(){
+  //   this.setInputFocused(false);
+  // }
+
+  getInputValue(){
+    const {typedValue, inputFocused} = this.state
+
+    if (inputFocused){
+      console.log("input is focused...");
+      return typedValue
+    }
+    console.log("input not focused...");
+    return this.selectedText
+  }
+
 
   render() {
     const {selectedValue, values, name} = this.props
@@ -147,6 +177,7 @@ console.log("jill23...shownValues??", this.state.shownValues)
     if (onSelect) {
       onSelect()
     }
+    this.setState({typedValue:''})
   }
 
   private get selectedText() {
