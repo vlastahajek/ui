@@ -7,6 +7,7 @@ import {
   Dropdown,
   DropdownMenuTheme,
   ComponentStatus,
+  Input,
 } from '@influxdata/clockface'
 
 // Actions
@@ -28,8 +29,39 @@ type ReduxProps = ConnectedProps<typeof connector>
 type Props = OwnProps & ReduxProps
 
 class VariableDropdown extends PureComponent<Props> {
+
+  constructor(props){
+    super(props)
+    this.state = {
+      typedText: '',
+      shownValues:props.values,
+    }
+  }
+
+  componentDidUpdate(prevProps){
+    const prevVals = prevProps.values
+    const values = this.props.values
+
+    if (prevVals.length !== values.length){
+      this.setState({shownValues:values})
+    }
+  }
+
+  const filterVals = (ack) => {
+    const {values} = this.props
+
+    const result = values.filter(val =>
+        val.toLowerCase().indexOf(ack.toLowerCase()) !== -1
+    )
+
+    console.log("filtering??? jill-ack1", result)
+
+    this.setState({shownValues:result, typedValue: ack})
+  }
+
   render() {
     const {selectedValue, values, name} = this.props
+    const {typedValue, shownValues} = this.state
 
     const dropdownStatus =
       values.length === 0 ? ComponentStatus.Disabled : ComponentStatus.Default
@@ -42,6 +74,18 @@ class VariableDropdown extends PureComponent<Props> {
 
     const widthLength = Math.max(140, longestItemWidth)
 
+    // const textInput =   <Input
+    //     placeholder='select a value'
+    //     onChange={e => filterVals(e.target.value)}
+    //     value={typedValue || getSelectedText()}
+    // />;
+
+console.log("jill23...shownValues??", this.state.shownValues)
+    console.log('jill23....actual vals?', values);
+
+
+
+
     return (
       <Dropdown
         style={{width: '140px'}}
@@ -53,8 +97,12 @@ class VariableDropdown extends PureComponent<Props> {
             onClick={onClick}
             testID="variable-dropdown--button"
             status={dropdownStatus}
-          >
-            {this.selectedText}
+          >  <Input
+              placeholder='select a value'
+              onChange={e => this.filterVals(e.target.value)}
+              value={typedValue || this.selectedText}
+          />
+
           </Dropdown.Button>
         )}
         menu={onCollapse => (
@@ -63,7 +111,7 @@ class VariableDropdown extends PureComponent<Props> {
             onCollapse={onCollapse}
             theme={DropdownMenuTheme.Amethyst}
           >
-            {values.map(val => {
+            {shownValues.map(val => {
               return (
                 <Dropdown.Item
                   key={val}
