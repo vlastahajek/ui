@@ -173,6 +173,9 @@ export const getVariable = (state: AppState, variableID: string): Variable => {
     return vari
   }
 
+  console.log('jill-a: looking at variables...', vari)
+  console.log("context....(jill-a-1)", ctx)
+
   if (vari.arguments.type === 'query') {
     if (!ctx || !ctx.values || !ctx.values.hasOwnProperty(variableID)) {
       // TODO load that ish for the context
@@ -183,6 +186,8 @@ export const getVariable = (state: AppState, variableID: string): Variable => {
   // Now validate that the selected value makes sense for
   // the current situation
   const vals = normalizeValues(vari)
+  console.log('jill-a-2:  got vals??', vals);
+
   vari = {...vari}
   if (
     !vari.selected ||
