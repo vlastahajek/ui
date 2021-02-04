@@ -469,8 +469,10 @@ const extractResult = (graph: VariableNode[]): Variable[] => {
 
     result[node.variable.id] = node.variable
   }
+   const arghh = Object.values(result)
+  console.log("jill42-a:  hydration of vars done??", arghh)
 
-  return Object.values(result)
+  return arghh
 }
 
 /*

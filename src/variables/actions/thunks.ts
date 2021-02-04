@@ -156,6 +156,7 @@ export const hydrateVariables = (
   const views = getActiveView(state)
   const usedVars = views.length ? filterUnusedVars(vars, views) : vars
 
+  console.log('jill42-a; hydrating vars...', vars, usedVars);
   const hydration = hydrateVars(usedVars, getAllVariablesFromState(state), {
     orgID: org.id,
     url: state.links.query.self,
