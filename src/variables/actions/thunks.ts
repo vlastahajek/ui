@@ -156,7 +156,7 @@ export const hydrateVariables = (
   const views = getActiveView(state)
   const usedVars = views.length ? filterUnusedVars(vars, views) : vars
 
-  console.log('jill42-a; hydrating vars...', vars, usedVars);
+  console.log('jill42-a; hydrating vars...', usedVars);
   const hydration = hydrateVars(usedVars, getAllVariablesFromState(state), {
     orgID: org.id,
     url: state.links.query.self,
@@ -481,10 +481,10 @@ export const selectValue = (variableID: string, selected: string) => async (
 
   await dispatch(selectValueInState(contextID, variableID, selected))
   // only hydrate the changedVariable
-  if (isFlagEnabled('hydratevars')) {
-    dispatch(hydrateChangedVariable(variableID))
-  } else {
+  // if (isFlagEnabled('hydratevars')) {
+  //   dispatch(hydrateChangedVariable(variableID))
+  // } else {
     dispatch(hydrateVariables(true))
-  }
+  //}
   dispatch(updateQueryVars({[variable.name]: selected}))
 }

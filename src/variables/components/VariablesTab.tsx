@@ -166,6 +166,8 @@ class VariablesTab extends PureComponent<Props, State> {
 const mstp = (state: AppState) => {
   const variables = getVariables(state)
 
+  console.log("jill42-c: got variables here in tab....", variables)
+
   return {variables}
 }
 

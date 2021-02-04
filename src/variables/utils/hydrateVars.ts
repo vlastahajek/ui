@@ -524,6 +524,10 @@ export const hydrateVars = (
     findSubgraphFunction = findSubgraphFeature
   }
 
+  console.log('jill42-b: inside hydrate: allVariables', allVariables)
+  console.log('jill42-b: inside hydrate: options', options)
+
+
   const graph = findSubgraphFunction(
     createVariableGraph(allVariables),
     variables
