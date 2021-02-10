@@ -12,7 +12,11 @@ import {LineProtocolTab} from 'src/types/index'
 type OwnProps = {onSubmit: () => void}
 type Props = OwnProps
 
-const tabs: LineProtocolTab[] = ['Upload File', 'Enter Manually']
+const tabs: LineProtocolTab[] = [
+  'Upload File',
+  'Enter Manually',
+  'Upload From URL',
+]
 
 const LineProtocol: FC<Props> = ({onSubmit}) => {
   return (

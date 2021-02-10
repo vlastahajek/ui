@@ -1,4 +1,4 @@
-import {RemoteDataState, WritePrecision} from 'src/types'
+import {RemoteDataState, WritePrecision, LineProtocolTab} from 'src/types'
 import {produce} from 'immer'
 
 import {
@@ -12,7 +12,7 @@ import {
 
 export interface LineProtocolState {
   body: string
-  tab: 'Upload File' | 'Enter Manually'
+  tab: LineProtocolTab
   writeStatus: RemoteDataState
   writeError: string
   precision: WritePrecision

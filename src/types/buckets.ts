@@ -15,7 +15,10 @@ export type Bucket = DemoBucket | OwnBucket
 
 export type RetentionRule = GenBucket['retentionRules'][0]
 
-export type LineProtocolTab = 'Upload File' | 'Enter Manually'
+export type LineProtocolTab =
+  | 'Upload File'
+  | 'Enter Manually'
+  | 'Upload From URL'
 
 export enum WritePrecision {
   Ms = 'ms',

@@ -79,6 +79,22 @@ $line-protocol--content-height: 300px;
   height: $line-protocol--content-height;
 }
 
+.line-protocol--enter-url {
+  display: flex;
+  padding-bottom: 10px;
+}
+
+.line-protocol--url-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  grid-gap: 10px;
+}
+
+.line-protocol--url-upload-button {
+  min-height: 100%;
+}
+
 .line-protocol--status {
   font-size: 13px;
   font-weight: 600;
