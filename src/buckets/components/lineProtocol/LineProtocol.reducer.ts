@@ -64,6 +64,7 @@ const lineProtocolReducer = (
       case RESET_LINE_PROTOCOL_STATE: {
         draftState.body = ''
         draftState.writeStatus = RemoteDataState.NotStarted
+        draftState.uploadStatus = RemoteDataState.NotStarted
         draftState.writeError = ''
 
         return

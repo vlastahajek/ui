@@ -79,6 +79,10 @@ $line-protocol--content-height: 300px;
   height: $line-protocol--content-height;
 }
 
+.line-protocol--buttongrid {
+  margin-top: 10px;
+}
+
 .line-protocol--enter-url {
   display: flex;
   padding-bottom: 10px;

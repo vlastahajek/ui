@@ -1,5 +1,5 @@
 // Libraries
-import React, {FC, ChangeEvent, useContext, useEffect, memo} from 'react'
+import React, {FC, ChangeEvent, useContext, memo} from 'react'
 
 // Components
 import {
@@ -17,7 +17,10 @@ import DragAndDrop from 'src/buckets/components/lineProtocol/configure/DragAndDr
 import {Context} from 'src/buckets/components/lineProtocol/LineProtocolWizard'
 
 // Action
-import {setBody} from 'src/buckets/components/lineProtocol/LineProtocol.creators'
+import {
+  setBody,
+  reset,
+} from 'src/buckets/components/lineProtocol/LineProtocol.creators'
 
 import {retrieveLineProtocolFromUrl} from 'src/buckets/components/lineProtocol/LineProtocol.thunks'
 import {RemoteDataState} from 'src/types'
@@ -28,12 +31,6 @@ interface Props {
 
 const TabBody: FC<Props> = ({onSubmit}) => {
   const [{body, uploadStatus, tab}, dispatch] = useContext(Context)
-
-  useEffect(() => {
-    if (uploadStatus === RemoteDataState.Done) {
-      onSubmit()
-    }
-  }, [uploadStatus, onSubmit])
 
   const handleTextChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -54,6 +51,50 @@ const TabBody: FC<Props> = ({onSubmit}) => {
   const handleSetBody = (b: string) => {
     dispatch(setBody(b))
   }
+
+  const handleReset = () => {
+    dispatch(reset())
+  }
+
+  const UploadButton = () => (
+    <Button
+      text="Upload"
+      color={ComponentColor.Primary}
+      onClick={handleSubmit}
+      status={
+        body.length && uploadStatus !== RemoteDataState.Error
+          ? ComponentStatus.Default
+          : uploadStatus === RemoteDataState.Loading
+          ? ComponentStatus.Loading
+          : ComponentStatus.Disabled
+      }
+      className="line-protocol--url-upload-button"
+      size={ComponentSize.Medium}
+    />
+  )
+
+  const SubmitButton = () => (
+    <Button
+      text="Submit"
+      color={ComponentColor.Success}
+      onClick={onSubmit}
+      status={body.length ? ComponentStatus.Default : ComponentStatus.Disabled}
+      className="line-protocol--url-upload-button"
+      size={ComponentSize.Medium}
+    />
+  )
+
+  const ResetButton = () => (
+    <Button
+      text="Reset"
+      color={ComponentColor.Danger}
+      onClick={handleReset}
+      status={ComponentStatus.Default}
+      className="line-protocol--url-upload-button"
+      style={{marginLeft: '5px'}}
+      size={ComponentSize.Medium}
+    />
+  )
 
   switch (tab) {
     case 'Upload File':
@@ -81,22 +122,31 @@ const TabBody: FC<Props> = ({onSubmit}) => {
             Enter URL
           </InputLabel>
           <Grid className="line-protocol--url-grid">
-            <Input
-              type={InputType.Text}
-              size={ComponentSize.Medium}
-              value={body}
-              onChange={handleTextChange}
-            />
-            <Button
-              text="Upload"
-              color={ComponentColor.Primary}
-              onClick={handleSubmit}
-              status={
-                body.length ? ComponentStatus.Default : ComponentStatus.Disabled
-              }
-              className="line-protocol--url-upload-button"
-              size={ComponentSize.Medium}
-            />
+            {uploadStatus === RemoteDataState.Done ? (
+              <Grid>
+                <TextArea
+                  value={body}
+                  placeholder="Write text here"
+                  onChange={handleTextChange}
+                  testID="line-protocol--text-area"
+                  className="line-protocol--content"
+                />
+                <Grid className="line-protocol--buttongrid">
+                  <SubmitButton />
+                  <ResetButton />
+                </Grid>
+              </Grid>
+            ) : (
+              <>
+                <Input
+                  type={InputType.Text}
+                  size={ComponentSize.Medium}
+                  value={body}
+                  onChange={handleTextChange}
+                />
+                <UploadButton />
+              </>
+            )}
           </Grid>
         </>
       )

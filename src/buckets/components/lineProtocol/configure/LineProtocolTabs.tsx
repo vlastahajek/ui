@@ -12,7 +12,7 @@ import {LineProtocolTab, RemoteDataState, WritePrecision} from 'src/types'
 
 // Actions
 import {
-  setBody,
+  reset,
   setTab,
   setPrecision,
 } from 'src/buckets/components/lineProtocol/LineProtocol.creators'
@@ -30,7 +30,7 @@ const LineProtocolTabs: FC<Props> = ({tabs, onSubmit}) => {
   const {tab, precision, writeStatus} = state
 
   const handleTabClick = (tab: LineProtocolTab) => {
-    dispatch(setBody(''))
+    dispatch(reset())
     dispatch(setTab(tab))
   }
 
