@@ -29,6 +29,7 @@ export const retrieveLineProtocolFromUrl = async (
     dispatch(setBody(response.data))
     dispatch(setUploadStatus(RemoteDataState.Done))
   } catch (err) {
+    dispatch(setUploadStatus(RemoteDataState.Error))
     console.error(err)
   }
 }
