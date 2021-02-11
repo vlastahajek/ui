@@ -1,9 +1,12 @@
 // Libraries
 import {Dispatch} from 'react'
+import axios from 'axios'
 
 // Action Creators
 import {
   setWriteStatus,
+  setUploadStatus,
+  setBody,
   Action,
 } from 'src/buckets/components/lineProtocol/LineProtocol.creators'
 
@@ -12,6 +15,23 @@ import {postWrite as apiPostWrite} from 'src/client'
 
 // Types
 import {RemoteDataState, WritePrecision} from 'src/types'
+
+export const retrieveLineProtocolFromUrl = async (
+  dispatch: Dispatch<Action>,
+  baseUrl: string,
+  params: {url: string}
+) => {
+  try {
+    dispatch(setUploadStatus(RemoteDataState.Loading))
+    const response = await axios.get(baseUrl, {
+      params,
+    })
+    dispatch(setBody(response.data))
+    dispatch(setUploadStatus(RemoteDataState.Done))
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 export const writeLineProtocolAction = async (
   dispatch: Dispatch<Action>,

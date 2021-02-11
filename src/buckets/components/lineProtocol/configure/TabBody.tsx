@@ -1,6 +1,5 @@
 // Libraries
-import React, {FC, ChangeEvent, useContext} from 'react'
-import axios from 'axios'
+import React, {FC, ChangeEvent, useContext, useEffect, memo} from 'react'
 
 // Components
 import {
@@ -20,12 +19,21 @@ import {Context} from 'src/buckets/components/lineProtocol/LineProtocolWizard'
 // Action
 import {setBody} from 'src/buckets/components/lineProtocol/LineProtocol.creators'
 
+import {retrieveLineProtocolFromUrl} from 'src/buckets/components/lineProtocol/LineProtocol.thunks'
+import {RemoteDataState} from 'src/types'
+
 interface Props {
-  onSubmit: (customBody: string | null) => void
+  onSubmit: () => void
 }
 
 const TabBody: FC<Props> = ({onSubmit}) => {
-  const [{body, tab}, dispatch] = useContext(Context)
+  const [{body, uploadStatus, tab}, dispatch] = useContext(Context)
+
+  useEffect(() => {
+    if (uploadStatus === RemoteDataState.Done) {
+      onSubmit()
+    }
+  }, [uploadStatus, onSubmit])
 
   const handleTextChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -33,13 +41,11 @@ const TabBody: FC<Props> = ({onSubmit}) => {
     dispatch(setBody(e.target.value))
   }
 
-  const handleSubmit = async e => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/url`, {
-        params: {url: body},
+      await retrieveLineProtocolFromUrl(dispatch, 'http://localhost:3000/url', {
+        url: body,
       })
-      onSubmit(response.data)
     } catch (err) {
       console.error(err)
     }
@@ -97,4 +103,4 @@ const TabBody: FC<Props> = ({onSubmit}) => {
   }
 }
 
-export default TabBody
+export default memo(TabBody)

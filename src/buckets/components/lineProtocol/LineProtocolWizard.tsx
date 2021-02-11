@@ -46,8 +46,8 @@ const LineProtocolWizard = () => {
     history.push(`/orgs/${orgID}/load-data/buckets`)
   }
 
-  const handleSubmit = (customBody: string = body) => {
-    writeLineProtocolAction(dispatch, org, bucket, customBody, precision)
+  const handleSubmit = () => {
+    writeLineProtocolAction(dispatch, org, bucket, body, precision)
   }
 
   return (

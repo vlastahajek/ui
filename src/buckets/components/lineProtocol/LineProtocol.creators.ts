@@ -6,11 +6,13 @@ export const SET_TAB = 'SET_TAB'
 export const SET_WRITE_STATUS = 'SET_WRITE_STATUS'
 export const SET_PRECISION = 'SET_PRECISION'
 export const RESET_LINE_PROTOCOL_STATE = 'RESET_LINE_PROTOCOL_STATE'
+export const SET_UPLOAD_STATUS = 'SET_UPLOAD_STATUS'
 
 export type Action =
   | ReturnType<typeof setBody>
   | ReturnType<typeof setTab>
   | ReturnType<typeof setWriteStatus>
+  | ReturnType<typeof setUploadStatus>
   | ReturnType<typeof setPrecision>
   | ReturnType<typeof reset>
 
@@ -31,6 +33,16 @@ export const setWriteStatus = (writeStatus: RemoteDataState, writeError = '') =>
     type: SET_WRITE_STATUS,
     writeStatus,
     writeError,
+  } as const)
+
+export const setUploadStatus = (
+  uploadStatus: RemoteDataState,
+  uploadError = ''
+) =>
+  ({
+    type: SET_UPLOAD_STATUS,
+    uploadStatus,
+    uploadError,
   } as const)
 
 export const setPrecision = (precision: WritePrecision) =>
