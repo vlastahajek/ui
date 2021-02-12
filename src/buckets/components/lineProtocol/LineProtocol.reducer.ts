@@ -18,6 +18,7 @@ export interface LineProtocolState {
   writeError: string
   precision: WritePrecision
   uploadStatus: RemoteDataState
+  uploadError: string
 }
 
 export const initialState = (): LineProtocolState => ({
@@ -27,6 +28,7 @@ export const initialState = (): LineProtocolState => ({
   writeError: '',
   precision: WritePrecision.Ns,
   uploadStatus: RemoteDataState.NotStarted,
+  uploadError: '',
 })
 
 const lineProtocolReducer = (
@@ -47,7 +49,7 @@ const lineProtocolReducer = (
       }
       case SET_UPLOAD_STATUS: {
         draftState.uploadStatus = action.uploadStatus
-
+        draftState.uploadError = action.uploadError
         return
       }
       case SET_WRITE_STATUS: {
