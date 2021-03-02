@@ -1,6 +1,5 @@
 // Libraries
 import {Dispatch} from 'react'
-import axios from 'axios'
 
 // Action Creators
 import {
@@ -16,18 +15,52 @@ import {postWrite as apiPostWrite} from 'src/client'
 // Types
 import {RemoteDataState, WritePrecision} from 'src/types'
 
-export const retrieveLineProtocolFromUrl = async (
+function onChunkedResponseError(err) {
+  console.error(err)
+}
+
+function processChunkedResponse(response) {
+  let text = ''
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+
+  return readChunk()
+
+  function readChunk() {
+    return reader.read().then(appendChunks)
+  }
+
+  function appendChunks(result) {
+    const chunk = decoder.decode(result.value || new Uint8Array(), {
+      stream: !result.done,
+    })
+    console.log('got chunk of', chunk.length, 'bytes')
+    text += chunk
+    console.log('text so far is', text.length, 'bytes\n')
+    if (result.done) {
+      console.log('returning')
+      return text
+    } else {
+      console.log('recursing')
+      return readChunk()
+    }
+  }
+}
+export const retrieveLineProtocolFromUrl = (
   dispatch: Dispatch<Action>,
   baseUrl: string,
   params: {url: string}
 ) => {
   try {
     dispatch(setUploadStatus(RemoteDataState.Loading))
-    const response = await axios.get(baseUrl, {
-      params,
-    })
-    dispatch(setBody(response.data))
-    dispatch(setUploadStatus(RemoteDataState.Done))
+    return fetch(`${baseUrl}?url=${params.url}`)
+      .then(r => processChunkedResponse(r, dispatch))
+      .then(res => {
+        console.log('done', res)
+        dispatch(setBody(res))
+        dispatch(setUploadStatus(RemoteDataState.Done))
+      })
+      .catch(onChunkedResponseError)
   } catch (err) {
     dispatch(setUploadStatus(RemoteDataState.Error))
     console.error(err)

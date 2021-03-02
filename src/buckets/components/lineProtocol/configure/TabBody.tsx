@@ -31,16 +31,15 @@ interface Props {
 
 const TabBody: FC<Props> = ({onSubmit}) => {
   const [{body, uploadStatus, tab}, dispatch] = useContext(Context)
-
   const handleTextChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     dispatch(setBody(e.target.value))
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     try {
-      await retrieveLineProtocolFromUrl(dispatch, 'http://localhost:3000/url', {
+      retrieveLineProtocolFromUrl(dispatch, 'http://localhost:3000/url', {
         url: body,
       })
     } catch (err) {
@@ -56,18 +55,12 @@ const TabBody: FC<Props> = ({onSubmit}) => {
     dispatch(reset())
   }
 
-  const UploadButton = () => (
+  const UploadButton = ({status}) => (
     <Button
       text="Upload"
       color={ComponentColor.Primary}
       onClick={handleSubmit}
-      status={
-        body.length && uploadStatus !== RemoteDataState.Error
-          ? ComponentStatus.Default
-          : uploadStatus === RemoteDataState.Loading
-          ? ComponentStatus.Loading
-          : ComponentStatus.Disabled
-      }
+      status={status}
       className="line-protocol--url-upload-button"
       size={ComponentSize.Medium}
     />
@@ -136,6 +129,17 @@ const TabBody: FC<Props> = ({onSubmit}) => {
                   <ResetButton />
                 </Grid>
               </Grid>
+            ) : uploadStatus === RemoteDataState.Loading ? (
+              <>
+                <Input
+                  type={InputType.Text}
+                  size={ComponentSize.Medium}
+                  value={body}
+                  onChange={handleTextChange}
+                  status={ComponentStatus.Disabled}
+                />
+                <UploadButton status={ComponentStatus.Loading} />
+              </>
             ) : (
               <>
                 <Input
@@ -144,7 +148,13 @@ const TabBody: FC<Props> = ({onSubmit}) => {
                   value={body}
                   onChange={handleTextChange}
                 />
-                <UploadButton />
+                <UploadButton
+                  status={
+                    body.length
+                      ? ComponentStatus.Default
+                      : ComponentStatus.Disabled
+                  }
+                />
               </>
             )}
           </Grid>
