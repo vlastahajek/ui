@@ -25,7 +25,12 @@ import LineProtocolFooterButtons from './LineProtocolFooterButtons'
 // Selectors
 import {getOrg} from 'src/organizations/selectors'
 
-type LineProtocolContext = [LineProtocolState, Dispatch<Action>]
+interface LineProtocolContextWithParams extends LineProtocolState {
+  org: string
+  bucket: string
+}
+
+type LineProtocolContext = [LineProtocolContextWithParams, Dispatch<Action>]
 export const Context = React.createContext<LineProtocolContext>(null)
 
 const getState = (bucketID: string) => (state: AppState) => {
@@ -51,7 +56,7 @@ const LineProtocolWizard = () => {
   }
 
   return (
-    <Context.Provider value={[state, dispatch]}>
+    <Context.Provider value={[{...state, org, bucket}, dispatch]}>
       <Overlay visible={true}>
         <Overlay.Container maxWidth={800}>
           <Overlay.Header

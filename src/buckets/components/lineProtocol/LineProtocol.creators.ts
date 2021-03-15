@@ -7,8 +7,10 @@ export const SET_WRITE_STATUS = 'SET_WRITE_STATUS'
 export const SET_PRECISION = 'SET_PRECISION'
 export const RESET_LINE_PROTOCOL_STATE = 'RESET_LINE_PROTOCOL_STATE'
 export const SET_UPLOAD_STATUS = 'SET_UPLOAD_STATUS'
+export const SET_PREVIEW = 'SET_PREVIEW'
 
 export type Action =
+  | ReturnType<typeof setPreview>
   | ReturnType<typeof setBody>
   | ReturnType<typeof setTab>
   | ReturnType<typeof setWriteStatus>
@@ -21,6 +23,9 @@ export const setBody = (body: string) =>
     type: SET_BODY,
     body,
   } as const)
+
+export const setPreview = (preview: string) =>
+  ({type: SET_PREVIEW, preview} as const)
 
 export const setTab = (tab: LineProtocolTab) =>
   ({

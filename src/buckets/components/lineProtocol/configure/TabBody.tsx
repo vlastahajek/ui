@@ -22,7 +22,10 @@ import {
   reset,
 } from 'src/buckets/components/lineProtocol/LineProtocol.creators'
 
-import {retrieveLineProtocolFromUrl} from 'src/buckets/components/lineProtocol/LineProtocol.thunks'
+import {
+  retrieveLineProtocolFromUrl,
+  writeLineProtocolStream,
+} from 'src/buckets/components/lineProtocol/LineProtocol.thunks'
 import {RemoteDataState} from 'src/types'
 
 interface Props {
@@ -30,7 +33,10 @@ interface Props {
 }
 
 const TabBody: FC<Props> = ({onSubmit}) => {
-  const [{body, uploadStatus, tab}, dispatch] = useContext(Context)
+  const [
+    {body, uploadStatus, tab, precision, org, bucket, preview},
+    dispatch,
+  ] = useContext(Context)
   const handleTextChange = (
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
@@ -55,6 +61,26 @@ const TabBody: FC<Props> = ({onSubmit}) => {
     dispatch(reset())
   }
 
+  const handleSubmitStream = () => {
+    try {
+      writeLineProtocolStream(
+        dispatch,
+        'http://localhost:3000/url',
+        {
+          url:
+            'https://gist.githubusercontent.com/ShmuelLotman/251220174761e69683f091957410ccb5/raw/fa7eff6831c76741cbc62c8f98888129f9ef088f/lptext',
+        },
+        {
+          precision,
+          org,
+          bucket,
+        }
+      )
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const UploadButton = ({status}) => (
     <Button
       text="Upload"
@@ -70,7 +96,7 @@ const TabBody: FC<Props> = ({onSubmit}) => {
     <Button
       text="Submit"
       color={ComponentColor.Success}
-      onClick={onSubmit}
+      onClick={handleSubmitStream}
       status={body.length ? ComponentStatus.Default : ComponentStatus.Disabled}
       className="line-protocol--url-upload-button"
       size={ComponentSize.Medium}
@@ -118,7 +144,7 @@ const TabBody: FC<Props> = ({onSubmit}) => {
             {uploadStatus === RemoteDataState.Done ? (
               <Grid>
                 <TextArea
-                  value={body}
+                  value={preview}
                   placeholder="Write text here"
                   onChange={handleTextChange}
                   testID="line-protocol--text-area"

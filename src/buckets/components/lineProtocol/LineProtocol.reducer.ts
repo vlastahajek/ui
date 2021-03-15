@@ -9,6 +9,7 @@ import {
   SET_TAB,
   RESET_LINE_PROTOCOL_STATE,
   SET_UPLOAD_STATUS,
+  SET_PREVIEW,
 } from 'src/buckets/components/lineProtocol/LineProtocol.creators'
 
 export interface LineProtocolState {
@@ -19,6 +20,7 @@ export interface LineProtocolState {
   precision: WritePrecision
   uploadStatus: RemoteDataState
   uploadError: string
+  preview: string
 }
 
 export const initialState = (): LineProtocolState => ({
@@ -29,6 +31,7 @@ export const initialState = (): LineProtocolState => ({
   precision: WritePrecision.Ns,
   uploadStatus: RemoteDataState.NotStarted,
   uploadError: '',
+  preview: '',
 })
 
 const lineProtocolReducer = (
@@ -37,6 +40,11 @@ const lineProtocolReducer = (
 ): LineProtocolState =>
   produce(state, draftState => {
     switch (action.type) {
+      case SET_PREVIEW: {
+        draftState.preview = action.preview
+
+        return
+      }
       case SET_BODY: {
         draftState.body = action.body
 
