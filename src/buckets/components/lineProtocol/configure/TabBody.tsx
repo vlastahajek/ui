@@ -26,6 +26,7 @@ import {
   retrieveLineProtocolFromUrl,
   writeLineProtocolStream,
 } from 'src/buckets/components/lineProtocol/LineProtocol.thunks'
+
 import {RemoteDataState} from 'src/types'
 
 interface Props {
@@ -67,8 +68,7 @@ const TabBody: FC<Props> = ({onSubmit}) => {
         dispatch,
         'http://localhost:3000/url',
         {
-          url:
-            'https://gist.githubusercontent.com/ShmuelLotman/251220174761e69683f091957410ccb5/raw/fa7eff6831c76741cbc62c8f98888129f9ef088f/lptext',
+          url: body,
         },
         {
           precision,
