@@ -23,7 +23,7 @@ export const retrieveLineProtocolFromUrl = async (
   try {
     dispatch(setUploadStatus(RemoteDataState.Loading))
     const lineProtocolUploadResponse = await fetch(
-      `${baseUrl}/preview?url=${params.url}`,
+      `${baseUrl}/api/v2/url/preview?url=${params.url}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export const writeLineProtocolStream = async (
     dispatch(setWriteStatus(RemoteDataState.Loading))
 
     const resp = await fetch(
-      `${baseUrl}/send?url=${params.url}&bucket=${bucket}&org=${org}&precision=${precision}`,
+      `${baseUrl}/api/v2/url/send?url=${params.url}&bucket=${bucket}&org=${org}&precision=${precision}`,
       {
         headers: {
           'Content-Type': 'application/json',
