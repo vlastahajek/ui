@@ -17,13 +17,12 @@ import {RemoteDataState, WritePrecision} from 'src/types'
 
 export const retrieveLineProtocolFromUrl = async (
   dispatch: Dispatch<Action>,
-  baseUrl: string,
   params: {url: string}
 ) => {
   try {
     dispatch(setUploadStatus(RemoteDataState.Loading))
     const lineProtocolUploadResponse = await fetch(
-      `${baseUrl}/api/v2/url/preview?url=${params.url}`,
+      `/api/v2/url/preview?url=${params.url}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +72,6 @@ const handleLineProtocolWriteResponseStatus = (
 
 export const writeLineProtocolStream = async (
   dispatch: Dispatch<Action>,
-  baseUrl: string,
   params: {url: string},
   options?: {
     bucket: string
@@ -86,7 +84,7 @@ export const writeLineProtocolStream = async (
     dispatch(setWriteStatus(RemoteDataState.Loading))
 
     const resp = await fetch(
-      `${baseUrl}/api/v2/url/send?url=${params.url}&bucket=${bucket}&org=${org}&precision=${precision}`,
+      `/api/v2/url/send?url=${params.url}&bucket=${bucket}&org=${org}&precision=${precision}`,
       {
         headers: {
           'Content-Type': 'application/json',

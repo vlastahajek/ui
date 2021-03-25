@@ -1,5 +1,5 @@
 // Libraries
-import React, {FC, ChangeEvent, useContext, memo} from 'react'
+import React, {FC, ChangeEvent, useContext, useEffect, memo} from 'react'
 
 // Components
 import {
@@ -33,7 +33,21 @@ interface Props {
   onSubmit: () => void
 }
 
+const ws = require('ws')
+
 const TabBody: FC<Props> = ({onSubmit}) => {
+  useEffect(() => {
+    const client = new ws(`${window.location.host}/api/v2/url`)
+
+    client.on('open', () => {
+      // Causes the server to print "Hello"
+      client.send('Hello')
+    })
+
+    return () => {
+      client.close()
+    }
+  }, [])
   const [
     {body, uploadStatus, tab, precision, org, bucket, preview},
     dispatch,
@@ -46,7 +60,7 @@ const TabBody: FC<Props> = ({onSubmit}) => {
 
   const handleSubmit = () => {
     try {
-      retrieveLineProtocolFromUrl(dispatch, 'http://localhost:3000/url', {
+      retrieveLineProtocolFromUrl(dispatch, {
         url: body,
       })
     } catch (err) {
@@ -66,7 +80,6 @@ const TabBody: FC<Props> = ({onSubmit}) => {
     try {
       writeLineProtocolStream(
         dispatch,
-        'http://localhost:3000/url',
         {
           url: body,
         },

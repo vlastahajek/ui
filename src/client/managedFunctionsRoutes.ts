@@ -12,11 +12,13 @@ export interface Function {
   description?: string
   orgID: string
   script: string
-  language?: any
-  readonly createdAt?: string
+  language?: FunctionLanguage
   url?: string
+  readonly createdAt?: string
   readonly updatedAt?: string
 }
+
+export type FunctionLanguage = 'python' | 'flux'
 
 export interface Error {
   readonly code:
@@ -39,25 +41,31 @@ export interface FunctionCreateRequest {
   description?: string
   orgID: string
   script: string
-  language: any
+  language: FunctionLanguage
 }
 
-export interface FunctionTriggerRequest {
+export type FunctionTriggerRequest = FunctionInvocationParams & {
   script: string
-  params?: any
+  method: 'GET' | 'POST'
   orgID?: string
   org?: string
-  language: 'python'
+  language: FunctionLanguage
 }
 
-export type FunctionRun = FunctionRunRecord & {
-  result?: any
+export interface FunctionInvocationParams {
+  params?: any
 }
 
-export interface FunctionRunRecord {
+export type FunctionTriggerResponse = FunctionRunBase & {
+  response?: FunctionHTTPResponse
+}
+
+export interface FunctionRunBase {
   readonly id?: string
-  status?: string
+  status?: 'ok' | 'error'
+  error?: string
   logs?: FunctionRunLog[]
+  response?: FunctionHTTPResponseNoData
   readonly startedAt?: string
 }
 
@@ -67,14 +75,31 @@ export interface FunctionRunLog {
   severity?: any
 }
 
+export interface FunctionHTTPResponseNoData {
+  type?: 'http'
+  dataType?: 'json'
+  headers?: any
+  statusCode?: '200' | '500' | '404'
+}
+
+export type FunctionHTTPResponse = FunctionHTTPResponseNoData & {
+  data?: FunctionHTTPResponseData
+}
+
+export type FunctionHTTPResponseData = any
+
 export interface FunctionUpdateRequest {
   name?: string
   description?: string
   script?: string
 }
 
-export interface FunctionRunRecords {
-  functionrunrecords?: FunctionRunRecord[]
+export interface FunctionRuns {
+  runs?: FunctionRun[]
+}
+
+export type FunctionRun = FunctionRunBase & {
+  response?: FunctionHTTPResponseNoData
 }
 
 interface RequestOptions {
@@ -177,284 +202,312 @@ const request = rc.request.bind(rc)
 export const setRequestHandler = rc.setRequestHandler.bind(rc)
 export const setResponseHandler = rc.setResponseHandler.bind(rc)
 
-export interface GetApiV2privateFunctionsParams {
+export interface GetApiV2FunctionsParams {
   query?: {
     org?: string
     orgID?: string
+    limit?: number
+    offset?: number
   }
 }
 
-type GetApiV2privateFunctionsResult =
-  | GetApiV2privateFunctionsOKResult
-  | GetApiV2privateFunctionsDefaultResult
+type GetApiV2FunctionsResult =
+  | GetApiV2FunctionsOKResult
+  | GetApiV2FunctionsDefaultResult
 
-interface GetApiV2privateFunctionsOKResult {
+interface GetApiV2FunctionsOKResult {
   status: 200
   headers: Headers
   data: Functions
 }
 
-interface GetApiV2privateFunctionsDefaultResult {
+interface GetApiV2FunctionsDefaultResult {
   status: 500
   headers: Headers
   data: Error
 }
 
-export const getApiV2privateFunctions = (
-  params: GetApiV2privateFunctionsParams,
+export const getApiV2Functions = (
+  params: GetApiV2FunctionsParams,
   options: RequestOptions = {}
-): Promise<GetApiV2privateFunctionsResult> =>
-  request('GET', '/api/v2private/functions', params, options) as Promise<
-    GetApiV2privateFunctionsResult
+): Promise<GetApiV2FunctionsResult> =>
+  request('GET', '/api/v2/functions', params, options) as Promise<
+    GetApiV2FunctionsResult
   >
 
-export interface PostApiV2privateFunctionParams {
+export interface PostApiV2FunctionParams {
   data: FunctionCreateRequest
 }
 
-type PostApiV2privateFunctionResult =
-  | PostApiV2privateFunctionCreatedResult
-  | PostApiV2privateFunctionDefaultResult
+type PostApiV2FunctionResult =
+  | PostApiV2FunctionCreatedResult
+  | PostApiV2FunctionDefaultResult
 
-interface PostApiV2privateFunctionCreatedResult {
+interface PostApiV2FunctionCreatedResult {
   status: 201
   headers: Headers
   data: Function
 }
 
-interface PostApiV2privateFunctionDefaultResult {
+interface PostApiV2FunctionDefaultResult {
   status: 500
   headers: Headers
   data: Error
 }
 
-export const postApiV2privateFunction = (
-  params: PostApiV2privateFunctionParams,
+export const postApiV2Function = (
+  params: PostApiV2FunctionParams,
   options: RequestOptions = {}
-): Promise<PostApiV2privateFunctionResult> =>
+): Promise<PostApiV2FunctionResult> =>
   request(
     'POST',
-    '/api/v2private/functions',
+    '/api/v2/functions',
     {...params, headers: {'Content-Type': 'application/json'}},
     options
-  ) as Promise<PostApiV2privateFunctionResult>
+  ) as Promise<PostApiV2FunctionResult>
 
-export interface PostApiV2privateFunctionsTriggerParams {
+export interface PostApiV2FunctionsTriggerParams {
   data: FunctionTriggerRequest
 }
 
-type PostApiV2privateFunctionsTriggerResult =
-  | PostApiV2privateFunctionsTriggerOKResult
-  | PostApiV2privateFunctionsTriggerDefaultResult
+type PostApiV2FunctionsTriggerResult =
+  | PostApiV2FunctionsTriggerOKResult
+  | PostApiV2FunctionsTriggerDefaultResult
 
-interface PostApiV2privateFunctionsTriggerOKResult {
+interface PostApiV2FunctionsTriggerOKResult {
   status: 200
   headers: Headers
-  data: FunctionRun
+  data: FunctionTriggerResponse
 }
 
-interface PostApiV2privateFunctionsTriggerDefaultResult {
+interface PostApiV2FunctionsTriggerDefaultResult {
   status: 500
   headers: Headers
   data: Error
 }
 
-export const postApiV2privateFunctionsTrigger = (
-  params: PostApiV2privateFunctionsTriggerParams,
+export const postApiV2FunctionsTrigger = (
+  params: PostApiV2FunctionsTriggerParams,
   options: RequestOptions = {}
-): Promise<PostApiV2privateFunctionsTriggerResult> =>
+): Promise<PostApiV2FunctionsTriggerResult> =>
   request(
     'POST',
-    '/api/v2private/functions/trigger',
+    '/api/v2/functions/trigger',
     {...params, headers: {'Content-Type': 'application/json'}},
     options
-  ) as Promise<PostApiV2privateFunctionsTriggerResult>
+  ) as Promise<PostApiV2FunctionsTriggerResult>
 
-export interface GetApiV2privateFunctionParams {
+export interface GetApiV2FunctionParams {
   functionID: string
 }
 
-type GetApiV2privateFunctionResult =
-  | GetApiV2privateFunctionOKResult
-  | GetApiV2privateFunctionDefaultResult
+type GetApiV2FunctionResult =
+  | GetApiV2FunctionOKResult
+  | GetApiV2FunctionDefaultResult
 
-interface GetApiV2privateFunctionOKResult {
+interface GetApiV2FunctionOKResult {
   status: 200
   headers: Headers
   data: Function
 }
 
-interface GetApiV2privateFunctionDefaultResult {
+interface GetApiV2FunctionDefaultResult {
   status: 500
   headers: Headers
   data: Error
 }
 
-export const getApiV2privateFunction = (
-  params: GetApiV2privateFunctionParams,
+export const getApiV2Function = (
+  params: GetApiV2FunctionParams,
   options: RequestOptions = {}
-): Promise<GetApiV2privateFunctionResult> =>
+): Promise<GetApiV2FunctionResult> =>
   request(
     'GET',
-    `/api/v2private/functions/${params.functionID}`,
+    `/api/v2/functions/${params.functionID}`,
     params,
     options
-  ) as Promise<GetApiV2privateFunctionResult>
+  ) as Promise<GetApiV2FunctionResult>
 
-export interface PatchApiV2privateFunctionParams {
+export interface PatchApiV2FunctionParams {
   functionID: string
 
   data: FunctionUpdateRequest
 }
 
-type PatchApiV2privateFunctionResult =
-  | PatchApiV2privateFunctionOKResult
-  | PatchApiV2privateFunctionDefaultResult
+type PatchApiV2FunctionResult =
+  | PatchApiV2FunctionOKResult
+  | PatchApiV2FunctionDefaultResult
 
-interface PatchApiV2privateFunctionOKResult {
+interface PatchApiV2FunctionOKResult {
   status: 200
   headers: Headers
   data: Function
 }
 
-interface PatchApiV2privateFunctionDefaultResult {
+interface PatchApiV2FunctionDefaultResult {
   status: 500
   headers: Headers
   data: Error
 }
 
-export const patchApiV2privateFunction = (
-  params: PatchApiV2privateFunctionParams,
+export const patchApiV2Function = (
+  params: PatchApiV2FunctionParams,
   options: RequestOptions = {}
-): Promise<PatchApiV2privateFunctionResult> =>
+): Promise<PatchApiV2FunctionResult> =>
   request(
     'PATCH',
-    `/api/v2private/functions/${params.functionID}`,
+    `/api/v2/functions/${params.functionID}`,
     {...params, headers: {'Content-Type': 'application/json'}},
     options
-  ) as Promise<PatchApiV2privateFunctionResult>
+  ) as Promise<PatchApiV2FunctionResult>
 
-export interface DeleteApiV2privateFunctionParams {
+export interface DeleteApiV2FunctionParams {
   functionID: string
 }
 
-type DeleteApiV2privateFunctionResult =
-  | DeleteApiV2privateFunctionNoContentResult
-  | DeleteApiV2privateFunctionDefaultResult
+type DeleteApiV2FunctionResult =
+  | DeleteApiV2FunctionNoContentResult
+  | DeleteApiV2FunctionDefaultResult
 
-interface DeleteApiV2privateFunctionNoContentResult {
+interface DeleteApiV2FunctionNoContentResult {
   status: 204
   headers: Headers
   data: any
 }
 
-interface DeleteApiV2privateFunctionDefaultResult {
+interface DeleteApiV2FunctionDefaultResult {
   status: 500
   headers: Headers
   data: Error
 }
 
-export const deleteApiV2privateFunction = (
-  params: DeleteApiV2privateFunctionParams,
+export const deleteApiV2Function = (
+  params: DeleteApiV2FunctionParams,
   options: RequestOptions = {}
-): Promise<DeleteApiV2privateFunctionResult> =>
+): Promise<DeleteApiV2FunctionResult> =>
   request(
     'DELETE',
-    `/api/v2private/functions/${params.functionID}`,
+    `/api/v2/functions/${params.functionID}`,
     params,
     options
-  ) as Promise<DeleteApiV2privateFunctionResult>
+  ) as Promise<DeleteApiV2FunctionResult>
 
-export interface GetApiV2privateFunctionsRunsParams {
+export interface GetApiV2FunctionsInvokeParams {
   functionID: string
+
+  query?: {
+    params?: any
+  }
 }
 
-type GetApiV2privateFunctionsRunsResult =
-  | GetApiV2privateFunctionsRunsOKResult
-  | GetApiV2privateFunctionsRunsDefaultResult
+type GetApiV2FunctionsInvokeResult = GetApiV2FunctionsInvokeDefaultResult
 
-interface GetApiV2privateFunctionsRunsOKResult {
-  status: 200
-  headers: Headers
-  data: FunctionRunRecords
-}
-
-interface GetApiV2privateFunctionsRunsDefaultResult {
+interface GetApiV2FunctionsInvokeDefaultResult {
   status: 500
   headers: Headers
-  data: Error
+  data: FunctionHTTPResponseData
 }
 
-export const getApiV2privateFunctionsRuns = (
-  params: GetApiV2privateFunctionsRunsParams,
+export const getApiV2FunctionsInvoke = (
+  params: GetApiV2FunctionsInvokeParams,
   options: RequestOptions = {}
-): Promise<GetApiV2privateFunctionsRunsResult> =>
+): Promise<GetApiV2FunctionsInvokeResult> =>
   request(
     'GET',
-    `/api/v2private/functions/${params.functionID}/runs`,
+    `/api/v2/functions/${params.functionID}/invoke`,
     params,
     options
-  ) as Promise<GetApiV2privateFunctionsRunsResult>
+  ) as Promise<GetApiV2FunctionsInvokeResult>
 
-export interface PostApiV2privateFunctionsRunParams {
+export interface PostApiV2FunctionsInvokeParams {
   functionID: string
+
+  data?: FunctionInvocationParams
 }
 
-type PostApiV2privateFunctionsRunResult =
-  | PostApiV2privateFunctionsRunCreatedResult
-  | PostApiV2privateFunctionsRunDefaultResult
+type PostApiV2FunctionsInvokeResult = PostApiV2FunctionsInvokeDefaultResult
 
-interface PostApiV2privateFunctionsRunCreatedResult {
-  status: 201
+interface PostApiV2FunctionsInvokeDefaultResult {
+  status: 500
   headers: Headers
-  data: FunctionRun
+  data: FunctionHTTPResponseData
 }
 
-interface PostApiV2privateFunctionsRunDefaultResult {
+export const postApiV2FunctionsInvoke = (
+  params: PostApiV2FunctionsInvokeParams,
+  options: RequestOptions = {}
+): Promise<PostApiV2FunctionsInvokeResult> =>
+  request(
+    'POST',
+    `/api/v2/functions/${params.functionID}/invoke`,
+    {...params, headers: {'Content-Type': 'application/json'}},
+    options
+  ) as Promise<PostApiV2FunctionsInvokeResult>
+
+export interface GetApiV2FunctionsRunsParams {
+  functionID: string
+
+  query?: {
+    limit?: number
+    offset?: number
+  }
+}
+
+type GetApiV2FunctionsRunsResult =
+  | GetApiV2FunctionsRunsOKResult
+  | GetApiV2FunctionsRunsDefaultResult
+
+interface GetApiV2FunctionsRunsOKResult {
+  status: 200
+  headers: Headers
+  data: FunctionRuns
+}
+
+interface GetApiV2FunctionsRunsDefaultResult {
   status: 500
   headers: Headers
   data: Error
 }
 
-export const postApiV2privateFunctionsRun = (
-  params: PostApiV2privateFunctionsRunParams,
+export const getApiV2FunctionsRuns = (
+  params: GetApiV2FunctionsRunsParams,
   options: RequestOptions = {}
-): Promise<PostApiV2privateFunctionsRunResult> =>
+): Promise<GetApiV2FunctionsRunsResult> =>
   request(
-    'POST',
-    `/api/v2private/functions/${params.functionID}/runs`,
+    'GET',
+    `/api/v2/functions/${params.functionID}/runs`,
     params,
     options
-  ) as Promise<PostApiV2privateFunctionsRunResult>
+  ) as Promise<GetApiV2FunctionsRunsResult>
 
-export interface GetApiV2privateFunctionsRunParams {
+export interface GetApiV2FunctionsRunParams {
   functionID: string
   runID: string
 }
 
-type GetApiV2privateFunctionsRunResult =
-  | GetApiV2privateFunctionsRunOKResult
-  | GetApiV2privateFunctionsRunDefaultResult
+type GetApiV2FunctionsRunResult =
+  | GetApiV2FunctionsRunOKResult
+  | GetApiV2FunctionsRunDefaultResult
 
-interface GetApiV2privateFunctionsRunOKResult {
+interface GetApiV2FunctionsRunOKResult {
   status: 200
   headers: Headers
   data: FunctionRun
 }
 
-interface GetApiV2privateFunctionsRunDefaultResult {
+interface GetApiV2FunctionsRunDefaultResult {
   status: 500
   headers: Headers
   data: Error
 }
 
-export const getApiV2privateFunctionsRun = (
-  params: GetApiV2privateFunctionsRunParams,
+export const getApiV2FunctionsRun = (
+  params: GetApiV2FunctionsRunParams,
   options: RequestOptions = {}
-): Promise<GetApiV2privateFunctionsRunResult> =>
+): Promise<GetApiV2FunctionsRunResult> =>
   request(
     'GET',
-    `/api/v2private/functions/${params.functionID}/runs/${params.runID}`,
+    `/api/v2/functions/${params.functionID}/runs/${params.runID}`,
     params,
     options
-  ) as Promise<GetApiV2privateFunctionsRunResult>
+  ) as Promise<GetApiV2FunctionsRunResult>
