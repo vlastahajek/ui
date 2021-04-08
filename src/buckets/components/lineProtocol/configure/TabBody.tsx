@@ -1,5 +1,6 @@
 // Libraries
-import React, {FC, ChangeEvent, useContext, useEffect, memo} from 'react'
+import React, {FC, ChangeEvent, useContext, memo} from 'react'
+import {useSelector} from 'react-redux'
 
 // Components
 import {
@@ -21,6 +22,7 @@ import {
   setBody,
   reset,
 } from 'src/buckets/components/lineProtocol/LineProtocol.creators'
+import {getMe} from 'src/me/selectors'
 
 import {
   retrieveLineProtocolFromUrl,
@@ -33,21 +35,9 @@ interface Props {
   onSubmit: () => void
 }
 
-const ws = require('ws')
-
 const TabBody: FC<Props> = ({onSubmit}) => {
-  useEffect(() => {
-    const client = new ws(`${window.location.host}/api/v2/url`)
+  const {id: userID} = useSelector(getMe)
 
-    client.on('open', () => {
-      // Causes the server to print "Hello"
-      client.send('Hello')
-    })
-
-    return () => {
-      client.close()
-    }
-  }, [])
   const [
     {body, uploadStatus, tab, precision, org, bucket, preview},
     dispatch,
@@ -62,6 +52,7 @@ const TabBody: FC<Props> = ({onSubmit}) => {
     try {
       retrieveLineProtocolFromUrl(dispatch, {
         url: body,
+        userID,
       })
     } catch (err) {
       console.error(err)
@@ -82,6 +73,7 @@ const TabBody: FC<Props> = ({onSubmit}) => {
         dispatch,
         {
           url: body,
+          userID,
         },
         {
           precision,

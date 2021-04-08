@@ -1124,6 +1124,20 @@ export const csvUploaderErrorNotification = (
   message: `Failed to upload the selected CSV: ${message}`,
 })
 
+export const urlUploadSuccessNotification = (
+  message?: string
+): Notification => ({
+  ...defaultSuccessNotification,
+  message: message ?? 'Successfully uploaded your line protocol',
+})
+
+export const urlUploadFailureNotification = (
+  message?: string
+): Notification => ({
+  ...defaultErrorNotification,
+  message: message ?? 'Failed to upload your line protocol',
+})
+
 // Functions
 export const functionGetFail = (): Notification => ({
   ...defaultErrorNotification,

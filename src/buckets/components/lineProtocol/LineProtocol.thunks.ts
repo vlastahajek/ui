@@ -17,18 +17,17 @@ import {RemoteDataState, WritePrecision} from 'src/types'
 
 export const retrieveLineProtocolFromUrl = async (
   dispatch: Dispatch<Action>,
-  params: {url: string}
+  params: {url: string; userID: string}
 ) => {
   try {
     dispatch(setUploadStatus(RemoteDataState.Loading))
-    const lineProtocolUploadResponse = await fetch(
-      `/api/v2/url/preview?url=${params.url}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+    const lineProtocolUploadResponse = await fetch(`/api/v2/url/preview`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    })
 
     const parsedResponse = await lineProtocolUploadResponse.text()
     dispatch(setPreview(parsedResponse))
@@ -72,7 +71,7 @@ const handleLineProtocolWriteResponseStatus = (
 
 export const writeLineProtocolStream = async (
   dispatch: Dispatch<Action>,
-  params: {url: string},
+  params: {url: string; userID: string},
   options?: {
     bucket: string
     org: string
@@ -82,13 +81,19 @@ export const writeLineProtocolStream = async (
   try {
     const {bucket, org, precision} = options
     dispatch(setWriteStatus(RemoteDataState.Loading))
-
+    console.log(window.location.host)
     const resp = await fetch(
-      `/api/v2/url/send?url=${params.url}&bucket=${bucket}&org=${org}&precision=${precision}`,
+      `/api/v2/url/send?url=${params.url}&bucket=${bucket}&org=${org}&precision=${precision}&userID=${params.userID}&baseurl=${window.location.host}`,
       {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          ...options,
+          baseurl: window.location.host,
+          ...params,
+        }),
       }
     )
 
