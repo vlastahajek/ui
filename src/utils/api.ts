@@ -25,6 +25,11 @@ export const getErrorMessage = (e: any) => {
     message = get(e, 'message')
   }
 
+  if (!message && Array.isArray(e)) {
+    const error = e.find(err => err.status >= 400)
+    message = get(error, 'data.message')
+  }
+
   if (!message) {
     message = 'unknown error'
   }
@@ -50,26 +55,7 @@ export const getMeQuartz = (): ReturnType<typeof getMe> => {
     email: 'asalem@influxdata.com',
     isRegionBeta: false,
     isOperator: true,
-    account: {
-      id: 'account123',
-      marketplace: null,
-      type: 'free',
-      organizations: null,
-      deletable: false,
-      balance: 0,
-      users: [],
-      billingContact: {
-        companyName: 'Influx',
-        email: 'asalem@influxdata.com',
-        firstName: 'Ariel',
-        lastName: 'Salem',
-        country: 'USA',
-        street1: '123 Main St',
-        city: 'New York',
-        subdivision: 'NY',
-        postalCode: 30000,
-      },
-    },
+    accountType: 'free',
   }
 
   return makeResponse(200, me)

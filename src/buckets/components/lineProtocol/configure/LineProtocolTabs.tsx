@@ -1,86 +1,34 @@
 // Libraries
-import React, {useContext, useEffect, FC} from 'react'
-import {useSelector, useDispatch} from 'react-redux'
+import React, {useContext, FC} from 'react'
 
 // Components
 import PrecisionDropdown from 'src/buckets/components/lineProtocol/configure/PrecisionDropdown'
 import TabSelector from 'src/buckets/components/lineProtocol/configure/TabSelector'
 import TabBody from 'src/buckets/components/lineProtocol/configure/TabBody'
-import {Context} from 'src/buckets/components/lineProtocol/LineProtocolWizard'
+import StatusIndicator from 'src/buckets/components/lineProtocol/verify/StatusIndicator'
+import {LineProtocolContext} from 'src/buckets/components/context/lineProtocol'
 
 // Types
-import {LineProtocolTab, RemoteDataState, WritePrecision} from 'src/types'
+import {RemoteDataState} from 'src/types'
 
-// Actions
-import {
-  reset,
-  setTab,
-  setPrecision,
-} from 'src/buckets/components/lineProtocol/LineProtocol.creators'
-import StatusIndicator from '../verify/StatusIndicator'
-import {getMe} from 'src/me/selectors'
-import {
-  urlUploadSuccessNotification,
-  urlUploadFailureNotification,
-} from 'src/shared/copy/notifications'
-import {notify} from 'src/shared/actions/notifications'
+// const LineProtocolTabs: FC<Props> = ({tabs, onSubmit}) => {
+//   const [state, dispatch] = useContext(Context)
+//   const {tab, precision, writeStatus} = state
 
-interface OwnProps {
-  tabs: LineProtocolTab[]
-  onSubmit: () => void
-}
+//   const reduxDispatch = useDispatch()
+//   const {id: userID} = useSelector(getMe)
 
-type Props = OwnProps
+//   const handleTabClick = (tab: LineProtocolTab) => {
+//     dispatch(reset())
+//     dispatch(setTab(tab))
+//   }
 
-const LineProtocolTabs: FC<Props> = ({tabs, onSubmit}) => {
-  const [state, dispatch] = useContext(Context)
-  const {tab, precision, writeStatus} = state
+//   const handleSetPrecision = (p: WritePrecision) => {
+//     dispatch(setPrecision(p))
+//   }
 
-  const reduxDispatch = useDispatch()
-  const {id: userID} = useSelector(getMe)
-
-  useEffect(() => {
-    const client = new WebSocket(`wss://${window.location.host}/api/v2/url/`)
-
-    client.onopen = () => {
-      client.send(JSON.stringify({userID, channel: '/register/user'}))
-    }
-
-    client.onmessage = function incoming({data}) {
-      // this will be the message that fires when the upload is finished for that user!
-      const {linesTotal, state, error} = JSON.parse(data)
-      console.log(JSON.parse(data))
-      if (state === 'success') {
-        reduxDispatch(
-          notify(
-            urlUploadSuccessNotification(
-              `Successfully uploaded ${linesTotal} lines of line protocol!`
-            )
-          )
-        )
-      } else {
-        reduxDispatch(notify(urlUploadFailureNotification(error?.message)))
-      }
-    }
-
-    client.onerror = err => {
-      console.log('oh no', err)
-    }
-    return () => {
-      window.addEventListener('beforeunload', () => {
-        client.close()
-      })
-    }
-  }, [])
-
-  const handleTabClick = (tab: LineProtocolTab) => {
-    dispatch(reset())
-    dispatch(setTab(tab))
-  }
-
-  const handleSetPrecision = (p: WritePrecision) => {
-    dispatch(setPrecision(p))
-  }
+const LineProtocolTabs: FC = () => {
+  const {writeStatus} = useContext(LineProtocolContext)
 
   if (writeStatus !== RemoteDataState.NotStarted) {
     return <StatusIndicator />
@@ -89,13 +37,10 @@ const LineProtocolTabs: FC<Props> = ({tabs, onSubmit}) => {
   return (
     <>
       <div className="line-protocol--header">
-        <TabSelector activeLPTab={tab} tabs={tabs} onClick={handleTabClick} />
-        <PrecisionDropdown
-          setPrecision={handleSetPrecision}
-          precision={precision}
-        />
+        <TabSelector />
+        <PrecisionDropdown />
       </div>
-      <TabBody onSubmit={onSubmit} />
+      <TabBody />
     </>
   )
 }

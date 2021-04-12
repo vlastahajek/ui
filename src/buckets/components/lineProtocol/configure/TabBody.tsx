@@ -1,5 +1,6 @@
 // Libraries
-import React, {FC, ChangeEvent, useContext, memo} from 'react'
+import React, {FC, useContext, memo} from 'react'
+import {useParams} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 
 // Components
@@ -15,72 +16,60 @@ import {
   Grid,
 } from '@influxdata/clockface'
 import DragAndDrop from 'src/buckets/components/lineProtocol/configure/DragAndDrop'
-import {Context} from 'src/buckets/components/lineProtocol/LineProtocolWizard'
+import {LineProtocolContext} from 'src/buckets/components/context/lineProtocol'
 
-// Action
-import {
-  setBody,
-  reset,
-} from 'src/buckets/components/lineProtocol/LineProtocol.creators'
-import {getMe} from 'src/me/selectors'
+// Utils
+import {getByID} from 'src/resources/selectors'
 
-import {
-  retrieveLineProtocolFromUrl,
-  writeLineProtocolStream,
-} from 'src/buckets/components/lineProtocol/LineProtocol.thunks'
+// Types
+import {AppState, Bucket, ResourceType, RemoteDataState} from 'src/types'
 
-import {RemoteDataState} from 'src/types'
-
-interface Props {
-  onSubmit: () => void
+type Props = {
+  bucket?: string
 }
 
-const TabBody: FC<Props> = ({onSubmit}) => {
-  const {id: userID} = useSelector(getMe)
+const TabBody: FC<Props> = ({bucket}) => {
+  const {
+    uploadStatus,
+    preview,
+    body,
+    handleSetBody,
+    tab,
+    writeLineProtocol,
+    retrieveLineProtocolFromUrl,
+    writeLineProtocolStream,
+    handleResetLineProtocol,
+  } = useContext(LineProtocolContext)
+  const {bucketID} = useParams<{bucketID?: string}>()
 
-  const [
-    {body, uploadStatus, tab, precision, org, bucket, preview},
-    dispatch,
-  ] = useContext(Context)
-  const handleTextChange = (
-    e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    dispatch(setBody(e.target.value))
+  const selectedBucket =
+    useSelector((state: AppState) =>
+      getByID<Bucket>(state, ResourceType.Buckets, bucketID)
+    )?.name ?? ''
+
+  const onSetBody = (b: string) => {
+    handleSetBody(b)
+  }
+
+  const handleTextChange = e => {
+    onSetBody(e.target.value)
   }
 
   const handleSubmit = () => {
+    writeLineProtocol(bucket ?? selectedBucket)
+  }
+
+  const handleSubmitStream = () => {
     try {
-      retrieveLineProtocolFromUrl(dispatch, {
-        url: body,
-        userID,
-      })
+      writeLineProtocolStream(body, bucket)
     } catch (err) {
       console.error(err)
     }
   }
 
-  const handleSetBody = (b: string) => {
-    dispatch(setBody(b))
-  }
-
-  const handleReset = () => {
-    dispatch(reset())
-  }
-
-  const handleSubmitStream = () => {
+  const handleSubmitURL = () => {
     try {
-      writeLineProtocolStream(
-        dispatch,
-        {
-          url: body,
-          userID,
-        },
-        {
-          precision,
-          org,
-          bucket,
-        }
-      )
+      retrieveLineProtocolFromUrl(body)
     } catch (err) {
       console.error(err)
     }
@@ -90,7 +79,7 @@ const TabBody: FC<Props> = ({onSubmit}) => {
     <Button
       text="Upload"
       color={ComponentColor.Primary}
-      onClick={handleSubmit}
+      onClick={handleSubmitURL}
       status={status}
       className="line-protocol--url-upload-button"
       size={ComponentSize.Medium}
@@ -112,7 +101,7 @@ const TabBody: FC<Props> = ({onSubmit}) => {
     <Button
       text="Reset"
       color={ComponentColor.Danger}
-      onClick={handleReset}
+      onClick={handleResetLineProtocol}
       status={ComponentStatus.Default}
       className="line-protocol--url-upload-button"
       style={{marginLeft: '5px'}}
@@ -125,8 +114,8 @@ const TabBody: FC<Props> = ({onSubmit}) => {
       return (
         <DragAndDrop
           className="line-protocol--content"
-          onSubmit={onSubmit}
-          onSetBody={handleSetBody}
+          onSubmit={handleSubmit}
+          onSetBody={onSetBody}
         />
       )
     case 'Enter Manually':
