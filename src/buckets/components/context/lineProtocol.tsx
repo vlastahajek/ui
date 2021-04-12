@@ -34,6 +34,7 @@ export interface LineProtocolContextType {
   retrieveLineProtocolFromUrl: (url: string) => void
   setPrecision: (_: WritePrecision) => void
   uploadStatus: RemoteDataState
+  uploads: any
   tab: LineProtocolTab
   userID: string
   writeError: string
@@ -53,6 +54,7 @@ export const DEFAULT_CONTEXT: LineProtocolContextType = {
   setPrecision: (_: WritePrecision) => {},
   tab: 'Upload File',
   uploadStatus: RemoteDataState.NotStarted,
+  uploads: {},
   userID: '',
   writeError: '',
   writeLineProtocol: (_: string) => {},
@@ -74,6 +76,7 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
   const [uploadStatus, setUploadStatus] = useState(RemoteDataState.NotStarted)
   const [writeStatus, setWriteStatus] = useState(RemoteDataState.NotStarted)
   const [writeError, setWriteError] = useState('')
+  const [uploadRecords, setUploadRecords] = useState<any>({})
 
   const org = useSelector(getOrg).name
   const {id: userID} = useSelector(getMe)
@@ -85,7 +88,7 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
     setWriteStatus(RemoteDataState.NotStarted)
     setWriteError('')
   }, [])
-
+  console.log(uploadRecords, 'RECORDSZZZZ')
   useEffect(() => {
     const client = new WebSocket(`wss://${window.location.host}/api/v2/url/`)
 
@@ -95,19 +98,22 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
 
     client.onmessage = function incoming({data}) {
       // this will be the message that fires when the upload is finished for that user!
-      const {linesTotal, state, error} = JSON.parse(data)
-      console.log(JSON.parse(data))
-      if (state === 'success') {
-        dispatch(
-          notify(
-            urlUploadSuccessNotification(
-              `Successfully uploaded ${linesTotal} lines of line protocol!`
+      const {linesTotal, state, error, uploads, eventname} = JSON.parse(data)
+
+      if (eventname === 'uploadResponse') {
+        if (state === 'success') {
+          dispatch(
+            notify(
+              urlUploadSuccessNotification(
+                `Successfully uploaded ${linesTotal} lines of line protocol!`
+              )
             )
           )
-        )
-      } else {
-        dispatch(notify(urlUploadFailureNotification(error?.message)))
+        } else {
+          dispatch(notify(urlUploadFailureNotification(error?.message)))
+        }
       }
+      setUploadRecords(JSON.parse(uploads))
     }
 
     client.onerror = err => {
@@ -242,6 +248,7 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
         uploadStatus,
         preview,
         retrieveLineProtocolFromUrl,
+        uploads: uploadRecords,
         userID,
         writeLineProtocolStream,
       }}

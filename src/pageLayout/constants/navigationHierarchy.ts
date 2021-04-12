@@ -167,6 +167,18 @@ export const generateNavItems = (orgID: string): NavItem[] => {
       ],
     },
     {
+      id: 'uploads',
+      testID: 'nav-item-uploads',
+      icon: IconFont.CaretUp,
+      label: 'Uploads',
+      featureFlag: 'lineProtocolURL',
+      link: {
+        type: 'link',
+        location: `${orgPrefix}/uploads`,
+      },
+      activeKeywords: ['uploads'],
+    },
+    {
       id: 'settings',
       testID: 'nav-item-settings',
       icon: IconFont.WrenchNav,

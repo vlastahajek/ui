@@ -37,6 +37,7 @@ import {
   UsersPage,
   UsagePage,
   BillingPage,
+  UploadsPage,
 } from 'src/shared/containers'
 
 // Types
@@ -58,6 +59,7 @@ import {
   TOKENS,
   TELEGRAFS,
   FILE_UPLOAD,
+  UPLOADS,
 } from 'src/shared/constants/routes'
 
 // Actions
@@ -209,6 +211,9 @@ const SetOrg: FC<Props> = ({
             path={`${orgPath}/${LOAD_DATA}/${BUCKETS}`}
             component={BucketsIndex}
           />
+
+          {/* Uploads */}
+          <Route path={`${orgPath}/${UPLOADS}`} component={UploadsPage} />
 
           {/* Settings */}
           <Route

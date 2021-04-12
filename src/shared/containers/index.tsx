@@ -99,3 +99,5 @@ export const FunctionsRouter = lazy(() =>
   import('src/functions/containers/FunctionsRouter')
 )
 export const CheckoutPage = lazy(() => import('src/checkout/CheckoutPage'))
+
+export const UploadsPage = lazy(() => import('src/uploads/UploadsPage'))

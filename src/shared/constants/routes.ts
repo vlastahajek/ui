@@ -37,3 +37,4 @@ export const FLUX_SOURCES = 'flux-sources'
 export const INTEGRATIONS = 'integrations'
 
 export const DATA_EXPLORER = 'data-explorer'
+export const UPLOADS = 'uploads'
