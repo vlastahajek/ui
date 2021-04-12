@@ -43,7 +43,6 @@ const LineProtocolTabs: FC<Props> = ({tabs, onSubmit}) => {
     const client = new WebSocket(`wss://${window.location.host}/api/v2/url/`)
 
     client.onopen = () => {
-      // Causes the server to print "Hello"
       client.send(JSON.stringify({userID, channel: '/register/user'}))
     }
 
@@ -65,10 +64,12 @@ const LineProtocolTabs: FC<Props> = ({tabs, onSubmit}) => {
     }
 
     client.onerror = err => {
-      console.log('oh shit', err)
+      console.log('oh no', err)
     }
     return () => {
-      client.close()
+      window.addEventListener('beforeunload', () => {
+        client.close()
+      })
     }
   }, [])
 

@@ -81,7 +81,7 @@ export const writeLineProtocolStream = async (
   try {
     const {bucket, org, precision} = options
     dispatch(setWriteStatus(RemoteDataState.Loading))
-    console.log(window.location.host)
+
     const resp = await fetch(
       `/api/v2/url/send?url=${params.url}&bucket=${bucket}&org=${org}&precision=${precision}&userID=${params.userID}&baseurl=${window.location.host}`,
       {
