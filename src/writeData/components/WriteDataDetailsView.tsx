@@ -33,7 +33,7 @@ const codeRenderer: Renderer<HTMLPreElement> = (props: any): any => {
 }
 
 const WriteDataDetailsView: FC<Props> = ({section, children}) => {
-  const {contentID} = useParams()
+  const {contentID} = useParams<any>()
   const {name, markdown, image} = section.items.find(
     item => item.id === contentID
   )

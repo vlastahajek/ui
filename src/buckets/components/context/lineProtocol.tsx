@@ -118,7 +118,7 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
     }
 
     client.onerror = err => {
-      console.log('oh no', err)
+      console.error(err)
     }
     return () => {
       window.addEventListener('beforeunload', () => {

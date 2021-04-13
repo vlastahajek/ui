@@ -32,7 +32,7 @@ function transform(template, vars) {
 }
 
 const WriteDataCodeSnippet: FC<Props> = ({code, language}) => {
-  const {contentID} = useParams()
+  const {contentID} = useParams<any>()
   const {bucket, token, origin, organization} = useContext(
     WriteDataDetailsContext
   )
