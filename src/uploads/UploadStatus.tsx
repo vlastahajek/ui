@@ -45,7 +45,7 @@ const UploadStatus: FC<PassedProps> = ({status}) => {
       <p>{text}</p>
     </>
   )
-  console.log(status)
+
   return (
     <>
       <div
