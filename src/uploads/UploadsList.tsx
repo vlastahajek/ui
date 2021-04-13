@@ -7,18 +7,24 @@ import UploadCard from 'src/uploads/UploadCard'
 interface OwnProps {
   term: string
 }
+const UploadsEmptyState: FC = () => {
+  return <h1>No uploaded data under current criteria has been detected.</h1>
+}
 const UploadsList: FC<OwnProps> = ({term}) => {
-  const {uploads} = useContext(LineProtocolContext)
-  console.log(uploads)
+  const {uploads, untrackUpload} = useContext(LineProtocolContext)
 
   const uploadList: any = Object.values(uploads).filter((upload: any) =>
     upload.url?.includes(term)
   )
   return (
     <ResourceList>
-      <ResourceList.Body emptyState={<h1>You aint got no shit here</h1>}>
+      <ResourceList.Body emptyState={<UploadsEmptyState />}>
         {uploadList.map(upload => (
-          <UploadCard key={upload.uploadID} upload={upload} />
+          <UploadCard
+            key={upload.uploadID}
+            upload={upload}
+            untrack={untrackUpload}
+          />
         ))}
       </ResourceList.Body>
     </ResourceList>

@@ -17,7 +17,7 @@ import {
 } from '@influxdata/clockface'
 import DragAndDrop from 'src/buckets/components/lineProtocol/configure/DragAndDrop'
 import {LineProtocolContext} from 'src/buckets/components/context/lineProtocol'
-
+import {WriteDataDetailsContext} from 'src/writeData/components/WriteDataDetailsContext'
 // Utils
 import {getByID} from 'src/resources/selectors'
 
@@ -29,6 +29,8 @@ type Props = {
 }
 
 const TabBody: FC<Props> = ({bucket}) => {
+  const uploadDataPageSelectedBucket = useContext(WriteDataDetailsContext)
+    .bucket
   const {
     uploadStatus,
     preview,
@@ -61,7 +63,12 @@ const TabBody: FC<Props> = ({bucket}) => {
 
   const handleSubmitStream = () => {
     try {
-      writeLineProtocolStream(body, bucket)
+      writeLineProtocolStream(
+        body,
+        bucket ?? selectedBucket.length
+          ? selectedBucket
+          : uploadDataPageSelectedBucket.name
+      )
     } catch (err) {
       console.error(err)
     }

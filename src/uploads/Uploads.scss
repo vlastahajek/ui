@@ -1,0 +1,10 @@
+.cf-resource-name {
+  position: relative;
+  max-width: 65%;
+
+  .cf-resource-name--text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+  }
+}

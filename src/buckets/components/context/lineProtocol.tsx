@@ -33,6 +33,7 @@ export interface LineProtocolContextType {
   preview: string
   retrieveLineProtocolFromUrl: (url: string) => void
   setPrecision: (_: WritePrecision) => void
+  untrackUpload: (_: string) => void
   uploadStatus: RemoteDataState
   uploads: any
   tab: LineProtocolTab
@@ -53,6 +54,7 @@ export const DEFAULT_CONTEXT: LineProtocolContextType = {
   retrieveLineProtocolFromUrl: (_url: string) => {},
   setPrecision: (_: WritePrecision) => {},
   tab: 'Upload File',
+  untrackUpload: (_: string) => {},
   uploadStatus: RemoteDataState.NotStarted,
   uploads: {},
   userID: '',
@@ -88,7 +90,7 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
     setWriteStatus(RemoteDataState.NotStarted)
     setWriteError('')
   }, [])
-  console.log(uploadRecords, 'RECORDSZZZZ')
+
   useEffect(() => {
     const client = new WebSocket(`wss://${window.location.host}/api/v2/url/`)
 
@@ -99,7 +101,6 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
     client.onmessage = function incoming({data}) {
       // this will be the message that fires when the upload is finished for that user!
       const {linesTotal, state, error, uploads, eventname} = JSON.parse(data)
-
       if (eventname === 'uploadResponse') {
         if (state === 'success') {
           dispatch(
@@ -113,7 +114,7 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
           dispatch(notify(urlUploadFailureNotification(error?.message)))
         }
       }
-      setUploadRecords(JSON.parse(uploads))
+      setUploadRecords(uploads)
     }
 
     client.onerror = err => {
@@ -123,6 +124,21 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
       window.addEventListener('beforeunload', () => {
         client.close()
       })
+    }
+  }, [])
+
+  const untrackUpload = useCallback(async (uploadID: string) => {
+    try {
+      const res = await fetch(
+        `/api/v2/url/uploads?userID=${userID}&uploadID=${uploadID}`,
+        {
+          method: 'DELETE',
+        }
+      )
+      const parsedRes = await res.json()
+      setUploadRecords(parsedRes.uploads)
+    } catch (err) {
+      console.error(err)
     }
   }, [])
 
@@ -176,7 +192,6 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
     async (url: string, bucket: string) => {
       try {
         setWriteStatus(RemoteDataState.Loading)
-
         const resp = await fetch(`/api/v2/url/send`, {
           method: 'POST',
           headers: {
@@ -248,6 +263,7 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
         uploadStatus,
         preview,
         retrieveLineProtocolFromUrl,
+        untrackUpload,
         uploads: uploadRecords,
         userID,
         writeLineProtocolStream,
