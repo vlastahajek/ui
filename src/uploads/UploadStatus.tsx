@@ -10,6 +10,7 @@ import {
   Appearance,
   PopoverInteraction,
   ComponentColor,
+  TechnoSpinner,
 } from '@influxdata/clockface'
 
 // Styles
@@ -19,7 +20,7 @@ interface PassedProps {
   status: string
 }
 
-const LastRunTaskStatus: FC<PassedProps> = ({status}) => {
+const UploadStatus: FC<PassedProps> = ({status}) => {
   const triggerRef = useRef<HTMLDivElement>(null)
   const [highlight, setHighlight] = useState<boolean>(false)
 
@@ -27,16 +28,10 @@ const LastRunTaskStatus: FC<PassedProps> = ({status}) => {
   let icon = IconFont.Checkmark
   let text = 'Upload finished successfully!'
 
-  if (status === 'failed') {
+  if (status === 'error') {
     color = ComponentColor.Danger
     icon = IconFont.AlertTriangle
     text = 'Upload Failed'
-  }
-
-  if (status === 'cancel') {
-    color = ComponentColor.Warning
-    icon = IconFont.Remove
-    text = 'Task Cancelled'
   }
 
   const statusClassName = classnames('upload', {
@@ -50,7 +45,7 @@ const LastRunTaskStatus: FC<PassedProps> = ({status}) => {
       <p>{text}</p>
     </>
   )
-
+  console.log(status)
   return (
     <>
       <div
@@ -58,7 +53,11 @@ const LastRunTaskStatus: FC<PassedProps> = ({status}) => {
         className={statusClassName}
         ref={triggerRef}
       >
-        <Icon glyph={icon} />
+        {status === 'loading' ? (
+          <TechnoSpinner diameterPixels={30} />
+        ) : (
+          <Icon glyph={icon} />
+        )}
       </div>
       <Popover
         className="upload--popover"
@@ -76,4 +75,4 @@ const LastRunTaskStatus: FC<PassedProps> = ({status}) => {
   )
 }
 
-export default LastRunTaskStatus
+export default UploadStatus

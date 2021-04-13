@@ -17,14 +17,50 @@ import {Context} from 'src/clockface'
 interface OwnProps {
   upload: any
   untrack: (_: string) => void
+  writeLineProtocolStream: (url: string, bucket: string) => Promise<void>
 }
 import './Uploads.scss'
 
-const ContextMenu: FC<OwnProps> = ({upload, untrack}) => {
+const ContextMenu: FC<OwnProps> = ({
+  upload,
+  untrack,
+  writeLineProtocolStream,
+}) => {
   const onDelete = async (u: any) => {
     await untrack(u.uploadID)
   }
-  return (
+  const onRetry = async (u: any) => {
+    await writeLineProtocolStream(u.url, u.bucket)
+  }
+
+  return upload.state === 'error' ? (
+    <Context>
+      <Context.Menu
+        icon={IconFont.Refresh}
+        color={ComponentColor.Success}
+        testID="context-retry-menu"
+      >
+        <Context.Item
+          label="Retry"
+          action={onRetry}
+          value={upload}
+          testID="context-retry-upload"
+        />
+      </Context.Menu>
+      <Context.Menu
+        icon={IconFont.Trash}
+        color={ComponentColor.Danger}
+        testID="context-delete-menu"
+      >
+        <Context.Item
+          label="Delete"
+          action={onDelete}
+          value={upload}
+          testID="context-delete-upload"
+        />
+      </Context.Menu>
+    </Context>
+  ) : (
     <Context>
       <Context.Menu
         icon={IconFont.Trash}
@@ -35,20 +71,30 @@ const ContextMenu: FC<OwnProps> = ({upload, untrack}) => {
           label="Delete"
           action={onDelete}
           value={upload}
-          testID="context-delete-task"
+          testID="context-delete-upload"
         />
       </Context.Menu>
     </Context>
   )
 }
-const UploadCard: FC<OwnProps> = ({upload, untrack}) => {
+const UploadCard: FC<OwnProps> = ({
+  upload,
+  untrack,
+  writeLineProtocolStream,
+}) => {
   return (
     <ResourceCard
       testID="upload-card"
       alignItems={AlignItems.Center}
       margin={ComponentSize.Large}
       direction={FlexDirection.Row}
-      contextMenu={<ContextMenu upload={upload} untrack={untrack} />}
+      contextMenu={
+        <ContextMenu
+          upload={upload}
+          untrack={untrack}
+          writeLineProtocolStream={writeLineProtocolStream}
+        />
+      }
     >
       <UploadStatus status={upload.state} />
       <FlexBox

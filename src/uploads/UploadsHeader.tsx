@@ -13,6 +13,7 @@ interface OwnProps {
   term: string
   setTerm: (term: string) => void
 }
+
 const UploadsHeader: FC<OwnProps> = ({term, setTerm}) => {
   return (
     <>

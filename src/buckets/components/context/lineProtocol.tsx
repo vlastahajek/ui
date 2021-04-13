@@ -110,7 +110,7 @@ export const LineProtocolProvider: FC<Props> = React.memo(({children}) => {
               )
             )
           )
-        } else {
+        } else if (state === 'error') {
           dispatch(notify(urlUploadFailureNotification(error?.message)))
         }
       }
