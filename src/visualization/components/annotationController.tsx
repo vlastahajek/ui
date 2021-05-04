@@ -7,7 +7,11 @@ import {notify} from 'src/shared/actions/notifications'
 import {createAnnotationFailed} from 'src/shared/copy/notifications'
 import {getErrorMessage} from 'src/utils/api'
 
-import {InteractionHandlerArguments} from '@influxdata/giraffe'
+import {
+  AnnotationLayerConfig,
+  InfluxColors,
+  InteractionHandlerArguments,
+} from '@influxdata/giraffe'
 
 export const makeAnnotationClickListener = (
   dispatch,
@@ -55,7 +59,7 @@ export const makeAnnotationClickListener = (
   return singleClickHandler
 }
 
-export const makeAnnotationClickHandler = (
+const makeAnnotationClickHandler = (
   cellID: string,
   dispatch,
   annotations,
@@ -83,4 +87,53 @@ export const makeAnnotationClickHandler = (
   }
 
   return result
+}
+
+export const makeAnnotationLayer = (
+  cellID,
+  xColumn,
+  yColumn,
+  groupKey,
+  annotations,
+  annotationsAreVisible,
+  dispatch
+) => {
+  const cellAnnotations = annotations ? annotations[cellID] ?? [] : []
+  const annotationsToRender: any[] = cellAnnotations.map(annotation => {
+    return {
+      ...annotation,
+      color: InfluxColors.Honeydew,
+    }
+  })
+
+  const handleAnnotationClick = makeAnnotationClickHandler(
+    cellID,
+    dispatch,
+    annotations
+  )
+
+  if (annotationsAreVisible && annotationsToRender.length) {
+    const annotationLayer: AnnotationLayerConfig = {
+      type: 'annotation',
+      x: xColumn,
+      y: yColumn,
+      fill: groupKey,
+      handleAnnotationClick,
+      annotations: annotationsToRender.map(annotation => {
+        return {
+          id: annotation.id,
+          title: annotation.summary,
+          description: '',
+          color: annotation.color,
+          startValue: new Date(annotation.startTime).getTime(),
+          stopValue: new Date(annotation.endTime).getTime(),
+          dimension: 'x',
+          pin: 'start',
+        }
+      }),
+    }
+
+    return annotationLayer
+  }
+  return null
 }

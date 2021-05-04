@@ -1,13 +1,20 @@
 // Libraries
 import React, {FC, useMemo, useContext} from 'react'
 import {
-  Plot,
+  AnnotationLayerConfig,
   DomainLabel,
   lineTransform,
-  getDomainDataFromLines,
   formatStatValue,
+  getDomainDataFromLines,
   getLatestValues,
+  Plot,
 } from '@influxdata/giraffe'
+
+// Redux
+import {
+  isSingleClickAnnotationsEnabled,
+  selectAreAnnotationsVisible,
+} from 'src/annotations/selectors'
 
 // Components
 import EmptyGraphMessage from 'src/shared/components/EmptyGraphMessage'
@@ -49,6 +56,12 @@ import {INVALID_DATA_COPY} from 'src/visualization/constants'
 import {LinePlusSingleStatProperties} from 'src/types'
 import {VisualizationProps} from 'src/visualization'
 import {isFlagEnabled} from '../../../shared/utils/featureFlag'
+
+// Annotations
+import {
+  makeAnnotationClickListener,
+  makeAnnotationLayer,
+} from 'src/visualization/components/annotationController'
 
 interface Props extends VisualizationProps {
   properties: LinePlusSingleStatProperties

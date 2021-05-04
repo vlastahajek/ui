@@ -5,7 +5,6 @@ import {
   AnnotationLayerConfig,
   Config,
   DomainLabel,
-  InfluxColors,
   Plot,
   getDomainDataFromLines,
   lineTransform,
@@ -22,8 +21,6 @@ import {
   isSingleClickAnnotationsEnabled,
   selectAreAnnotationsVisible,
 } from 'src/annotations/selectors'
-
-import {showOverlay, dismissOverlay} from 'src/overlays/actions/overlays'
 
 // Constants
 import {VIS_THEME, VIS_THEME_LIGHT} from 'src/shared/constants'
@@ -55,12 +52,11 @@ import {
   defaultYColumn,
 } from 'src/shared/utils/vis'
 import {isFlagEnabled} from 'src/shared/utils/featureFlag'
-import {event} from 'src/cloud/utils/reporting'
 
-// Notifications
+// Annotations
 import {
-  makeAnnotationClickHandler,
   makeAnnotationClickListener,
+  makeAnnotationLayer,
 } from 'src/visualization/components/annotationController'
 
 interface Props extends VisualizationProps {
@@ -216,48 +212,23 @@ const XYPlot: FC<Props> = ({
   }
 
   if (isFlagEnabled('annotations')) {
-    // annotations and the cellID might or might be provided to this graph view
-    const cellAnnotations = annotations ? annotations[cellID] ?? [] : []
-    const annotationsToRender: any[] = cellAnnotations.map(annotation => {
-      return {
-        ...annotation,
-        color: InfluxColors.Honeydew,
-      }
-    })
-
     if (inAnnotationWriteMode && cellID) {
       config.interactionHandlers = {
         singleClick: makeAnnotationClickListener(dispatch, cellID),
       }
     }
 
-    const handleAnnotationClick = makeAnnotationClickHandler(
+    const annotationLayer: AnnotationLayerConfig = makeAnnotationLayer(
       cellID,
-      dispatch,
-      annotations
+      xColumn,
+      yColumn,
+      groupKey,
+      annotations,
+      annotationsAreVisible,
+      dispatch
     )
 
-    if (annotationsAreVisible && annotationsToRender.length) {
-      const annotationLayer: AnnotationLayerConfig = {
-        type: 'annotation',
-        x: xColumn,
-        y: yColumn,
-        fill: groupKey,
-        handleAnnotationClick,
-        annotations: annotationsToRender.map(annotation => {
-          return {
-            id: annotation.id,
-            title: annotation.summary,
-            description: '',
-            color: annotation.color,
-            startValue: new Date(annotation.startTime).getTime(),
-            stopValue: new Date(annotation.endTime).getTime(),
-            dimension: 'x',
-            pin: 'start',
-          }
-        }),
-      }
-
+    if (annotationLayer) {
       config.layers.push(annotationLayer)
     }
   }
