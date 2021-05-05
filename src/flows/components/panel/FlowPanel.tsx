@@ -1,5 +1,5 @@
 // Libraries
-import React, {FC, useContext, useCallback, ReactNode} from 'react'
+import React, {FC, useContext, useCallback, ReactNode, createContext} from 'react'
 import classnames from 'classnames'
 
 // Components
@@ -13,10 +13,11 @@ import Results from 'src/flows/components/panel/Results'
 import {PIPE_DEFINITIONS} from 'src/flows'
 
 // Types
-import {PipeContextProps} from 'src/types/flows'
+import {Flow, PipeContextProps} from 'src/types/flows'
 
 // Contexts
 import {FlowContext} from 'src/flows/context/flow.current'
+import CopyToClipboardButton from './CopyToClipboardButton'
 
 export interface Props extends PipeContextProps {
   id: string
@@ -28,6 +29,20 @@ export interface HeaderProps {
   controls?: ReactNode
   persistentControl?: ReactNode
 }
+
+export interface FlowCopyToClipboardContextType {
+  get: (flow?: Flow) => Promise<string>
+}
+
+export const DEFAULT_CONTEXT: FlowCopyToClipboardContextType = {
+  get: (_flow?: Flow) => {},
+} as FlowCopyToClipboardContextType
+
+export const FlowListContext = React.createContext<FlowCopyToClipboardContextType>(
+  DEFAULT_CONTEXT
+)
+
+export const CopyToClipboardContext = createContext({})
 
 const FlowPanelHeader: FC<HeaderProps> = ({
   id,
@@ -62,6 +77,7 @@ const FlowPanelHeader: FC<HeaderProps> = ({
   )
 
   const remove = useCallback(() => removePipe(), [removePipe, id])
+
   return (
     <div className="flow-panel--header">
       <div className="flow-panel--node-wrapper">
@@ -88,6 +104,8 @@ const FlowPanelHeader: FC<HeaderProps> = ({
           <div className="flow-panel--persistent-control">
             <PanelVisibilityToggle id={id} />
             <RemovePanelButton onRemove={remove} />
+            {/* Temporary Button until the copy client code mechanism is ready */}
+            <CopyToClipboardButton fid={id} />
             {persistentControl}
           </div>
         </>
