@@ -168,11 +168,28 @@ jobs:
           command: |
             docker load < ~/docker-cache/image.tar
       - run:
-          name: Push the image to quay
           command: |
             docker tag quay.io/influxdb/ui-acceptance:${CIRCLE_SHA1} quay.io/influxdb/ui-acceptance:latest
             docker push quay.io/influxdb/ui-acceptance:${CIRCLE_SHA1}
             docker push quay.io/influxdb/ui-acceptance:latest
+  share-oss-image:
+    docker:
+      - image: circleci/golang:1.15-node
+    working_directory: ~/
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          key: UI_OSS_DOCKER_IMAGE_CACHE_{{ .Environment.CIRCLE_SHA1 }}
+      - run: docker login -u=$QUAY_USER -p=$QUAY_PASS quay.io
+      - run:
+          name: Load the OSS image
+          command: |
+            docker load < ~/docker-cache-oss/image.tar
+      - run:
+          command: |
+            docker tag quay.io/influxdb/ui-acceptance:${CIRCLE_SHA1} quay.io/influxdb/ui-acceptance:latest-oss
+            docker push quay.io/influxdb/ui-acceptance:latest-oss
   cloud-e2e:
     machine:
       image: ubuntu-2004:202008-01
@@ -607,6 +624,13 @@ workflows:
             - cloud-e2e
             # TODO: uncomment this when we disable cloud-e2e
             # - cloud-e2e-k8s-idpe
+      - share-oss-image:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - oss-e2e
       - monitor-ci-tests:
           requires:
             - unit

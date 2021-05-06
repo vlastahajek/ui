@@ -32,6 +32,7 @@ set -eu -o pipefail
 # Required Env Vars for Running from the influxdb OSS Repository:
 # - OSS_SHA: the influxdb repo commit SHA we're running against
 # - MONITOR_CI_BRANCH: the branch of the monitor-ci repo to start a pipeline with (usually 'master')
+# - UI_TAG: the tag of the docker image of the UI to test against. for testing against the UI "master" branch, the tag should be "latest-oss"
 ########################
 
 # make dir for artifacts
@@ -94,8 +95,8 @@ if [[ -z "${OSS_SHA:-}" ]]; then
 	reqData="{\"branch\":\"${MONITOR_CI_BRANCH}\", \"parameters\":{ \"ui-sha\":\"${SHA}\", \"ui-branch\":\"${UI_BRANCH}\", \"ui-pull-request\":\"${PULL_REQUEST}\", \"deploy-prod\":${DEPLOY_PROD}}}"
 else
 	# set the parameters for starting the monitor-ci pipeline from the influxdb repo
-	pipelineStartMsg="starting monitor-ci pipeline targeting monitor-ci branch ${MONITOR_CI_BRANCH} using OSS SHA ${OSS_SHA}"
-	reqData="{\"branch\":\"${MONITOR_CI_BRANCH}\", \"parameters\":{ \"oss-sha\":\"${OSS_SHA}\" }}"
+	pipelineStartMsg="starting monitor-ci pipeline targeting monitor-ci branch ${MONITOR_CI_BRANCH} using OSS SHA ${OSS_SHA} and UI tag ${UI_TAG}"
+	reqData="{\"branch\":\"${MONITOR_CI_BRANCH}\", \"parameters\":{ \"oss-sha\":\"${OSS_SHA}\", \"ui-tag\":\"${UI_TAG}\" }}"
 fi
 
 printf "\n${pipelineStartMsg}\n"
