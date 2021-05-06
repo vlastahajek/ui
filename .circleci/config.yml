@@ -625,10 +625,10 @@ workflows:
             # TODO: uncomment this when we disable cloud-e2e
             # - cloud-e2e-k8s-idpe
       - share-oss-image:
-          filters:
-            branches:
-              only:
-                - master
+          # filters:
+          #   branches:
+          #     only:
+          #       - master
           requires:
             - oss-e2e
       - monitor-ci-tests:
