@@ -55,7 +55,7 @@ const PanelQueryOverlay: FC<Props> = ({panelId}) => {
   }
 
   return (
-    <Overlay visible={true}>
+    <Overlay visible={visible}>
       <Overlay.Container>
         <Overlay.Header
           title={`Export to ${CLIENT_DEFINITIONS[contentID].name} Client Library`}
